@@ -5,7 +5,6 @@ OPERATORS = ["+", "-", "*", "/",
 
 def parse(l):
     stack = []
-    print l
     for t in filter(lambda x: not x.isspace(), l):
         if t not in OPERATORS:
             stack.append(t)
@@ -13,7 +12,6 @@ def parse(l):
             a = stack.pop()
             b = stack.pop()
             stack.append("({}{}{})".format(b, t, a))
-        print stack
     return stack[0]
 
 class Underscore(object):
@@ -23,6 +21,7 @@ class Underscore(object):
         self.operand = operand
         self._is_leaf = not left and not right
         self.operator = operator
+        self._lambda_cache = None
 
     def __add__(self, other):
         return self.do(other, "+")
@@ -86,11 +85,15 @@ class Underscore(object):
         return self.create_lambda_string()
 
     def __call__(self, *args):
-        return eval(self.create_lambda_string())(*args)
+        if self._lambda_cache is None:
+            self._lambda_cache = eval(self.create_lambda_string())
+        return self._lambda_cache(*args)
 
 _ = Underscore()
 
 if __name__ == '__main__':
+    l = (_ + _)
+    print l(1, 2)
     print (_ + _)(1, 2)
     print (_ > ((_ + _) * (_ + _)))(1, 2, 3, 4, 5) 
     print map(_ + 1, [1, 2, 3, 4])
