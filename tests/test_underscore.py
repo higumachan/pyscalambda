@@ -34,5 +34,8 @@ class UnderscoreTest(TestCase):
         eq_((_.split(",") + ["rikka"])("test,nadeko"), ["test", "nadeko", "rikka"])
 
     def test_str_args(self):
-        eq_((_ + " is " + _)("nadeko", "cute"))
-        eq_((_ * _)("nadeko", 4))
+        eq_((_ + " is " + _)("nadeko", "cute"), "nadeko is cute")
+        eq_((_ * _)("nadeko", 4), "nadeko" * 4)
+
+    def test_bug_case1(self):
+        eq_(("_a" + _)("test"), "_atest")
