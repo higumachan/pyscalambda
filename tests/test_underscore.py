@@ -28,4 +28,11 @@ class UnderscoreTest(TestCase):
         eq_((3 * _)(1), 3)
         eq_((3 / _)(1), 3)
         eq_((3 ** _)(1), 3)
+    
+    def test_call_method(self):
+        eq_((_.split(","))("test,nadeko"), ["test", "nadeko"])
+        eq_((_.split(",") + ["rikka"])("test,nadeko"), ["test", "nadeko", "rikka"])
 
+    def test_str_args(self):
+        eq_((_ + " is " + _)("nadeko", "cute"))
+        eq_((_ * _)("nadeko", 4))

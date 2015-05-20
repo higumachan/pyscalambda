@@ -147,7 +147,7 @@ class Underscore(object):
 
     def traverse(self):
         if self._is_leaf:
-            return [self.operand] if self.operand is None else [str(self.operand)]
+            return ["\"" + str(self.operand) + "\""] if isinstance(self.operand, str) and not self.operand.startswith("_") else [str(self.operand)]
         return self.left.traverse() + self.right.traverse() + [self.operator]
 
     def create_lambda_string(self):
@@ -170,7 +170,7 @@ class Underscore(object):
 
     def __call__(self, *args):
         if self._is_method_call:
-            return Underscore(operand="{}({})".format(self.operand, ",".join(map(lambda x: "\""+  x + "\"", map(str, args)))))
+            return Underscore(operand="{}({})".format(self.operand, ",".join(map(lambda x: "\""+  x + "\"" if x.isalpha else x, map(str, args)))))
         if self._lambda_cache is None:
             self._lambda_cache = eval(self.create_lambda_string())
         return self._lambda_cache(*args)
@@ -187,5 +187,7 @@ if __name__ == '__main__':
     print (_ > ((_ + _) * (_ + _)))(1, 2, 3, 4, 5) 
     print map(_ + 1, [1, 2, 3, 4])
     print str(_.split(","))
-    print (_.split(","))("test,nadeko")
+    print str(_.split(","))
+    print (_.split(",") + ["rikka", "test"])("test,nadeko")
+    print((_ + " is " + _)("nadeko", "cute"))
 
