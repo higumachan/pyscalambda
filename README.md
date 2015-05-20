@@ -7,7 +7,7 @@ Scalaの
 	
 みたいな感じのラムダ式を書くためのライブラリ
 
-##使い方(予定)
+##使い方
 
 	from pyscalambda import _
 	
