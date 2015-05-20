@@ -1,7 +1,7 @@
 
 OPERATORS = ["+", "-", "*", "/",
         "%", "<", "<=", ">", ">=",
-        "==", "!="]
+        "==", "!=", "**"]
 
 def parse(l):
     stack = []
@@ -56,10 +56,84 @@ class Underscore(object):
     def __ne__(self, other):
         return self.do(other, "!=")
 
+    def __pow__(self, other):
+        return self.do(other, "**")
+
+    def __lshift__(self, other):
+        return self.do(other, "<<")
+
+    def __rshift__(self, other):
+        return self.do(other, ">>")
+
+    def __and__(self, other):
+        return self.do(other, "and")
+
+    def __or__(self, other):
+        return self.do(other, "or")
+
+    def __xor__(self, other):
+        return self.do(other, "xor")
+
+    def __radd__(self, other):
+        return self.rdo(other, "+")
+
+    def __rsub__(self, other):
+        return self.rdo(other, "-")
+
+    def __rmul__(self, other):
+        return self.rdo(other, "*")
+
+    def __rfloordiv__(self, other):
+        return self.rdo(other, "/")
+
+    def __rmod__(self, other):
+        return self.rdo(other, "%")
+    
+    def __rlt__(self, other):
+        return self.rdo(other, "<")
+
+    def __rle__(self, other):
+        return self.rdo(other, "<=")
+
+    def __rgt__(self, other):
+        return self.rdo(other, ">")
+
+    def __rge__(self, other):
+        return self.rdo(other, ">=")
+
+    def __req__(self, other):
+        return self.rdo(other, "==")
+
+    def __rne__(self, other):
+        return self.rdo(other, "!=")
+
+    def __rpow__(self, other):
+        return self.rdo(other, "**")
+
+    def __rlshift__(self, other):
+        return self.rdo(other, "<<")
+
+    def __rrshift__(self, other):
+        return self.rdo(other, ">>")
+
+    def __rand__(self, other):
+        return self.rdo(other, "and")
+
+    def __ror__(self, other):
+        return self.rdo(other, "or")
+
+    def __rxor__(self, other):
+        return self.rdo(other, "xor")
+
     def do(self, other, operator):
         if not isinstance(other, Underscore):
             other = Underscore(operand=other)
         return Underscore(self, other, operator)
+
+    def rdo(self, other, operator):
+        if not isinstance(other, Underscore):
+            other = Underscore(operand=other)
+        return Underscore(other, self, operator)
 
     def traverse(self):
         if self._is_leaf:
@@ -92,6 +166,7 @@ class Underscore(object):
 _ = Underscore()
 
 if __name__ == '__main__':
+    print (1 + _)(10)
     l = (_ + _)
     print l(1, 2)
     print (_ + _)(1, 2)
