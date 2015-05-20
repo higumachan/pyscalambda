@@ -15,11 +15,12 @@ def parse(l):
     return stack[0]
 
 class Underscore(object):
-    def __init__(self, left=None, right=None, operator=None, operand=None):
+    def __init__(self, left=None, right=None, operator=None, operand=None, method_call=None):
         self.left = left
         self.right = right
         self.operand = operand
         self._is_leaf = not left and not right
+        self._is_method_call = method_call
         self.operator = operator
         self._lambda_cache = None
 
@@ -125,6 +126,9 @@ class Underscore(object):
     def __rxor__(self, other):
         return self.rdo(other, "xor")
 
+    def __getattr__(self, method):
+        return Underscore(operand="_.{}".format(method), method_call=True)
+
     def do(self, other, operator):
         if not isinstance(other, Underscore):
             other = Underscore(operand=other)
@@ -137,20 +141,20 @@ class Underscore(object):
 
     def traverse(self):
         if self._is_leaf:
-            return ["_"] if self.operand is None else [str(self.operand)]
+            return [self.operand] if self.operand is None else [str(self.operand)]
         return self.left.traverse() + self.right.traverse() + [self.operator]
 
     def create_lambda_string(self):
         c = [0]
         def us2args(x):
-            if x == "_":
+            if x.startswith("_"):
                 k = c[0]
                 c[0] += 1
-                return "x{}".format(k)
+                return x.replace("_", "x{}".format(k))
             return x
         rp_form = map(us2args, self.traverse())
         body =  parse(rp_form)
-        args = ",".join(filter(lambda x: x[0] == "x", rp_form))
+        args = ",".join(map(lambda x: x.split(".")[0], filter(lambda x: x[0] == "x", rp_form)))
 
         return "lambda {}:{}".format(args, body)
 
@@ -159,17 +163,23 @@ class Underscore(object):
         return self.create_lambda_string()
 
     def __call__(self, *args):
+        if self._is_method_call:
+            return Underscore(operand="{}({})".format(self.operand, ",".join(map(lambda x: "\""+  x + "\"", map(str, args)))))
         if self._lambda_cache is None:
             self._lambda_cache = eval(self.create_lambda_string())
         return self._lambda_cache(*args)
 
-_ = Underscore()
+_ = Underscore(operand="_")
 
 if __name__ == '__main__':
-    print (1 + _)(10)
+    print _(1)
+    print map(_, range(10))
+    print map(1 + _, range(10))
     l = (_ + _)
     print l(1, 2)
     print (_ + _)(1, 2)
     print (_ > ((_ + _) * (_ + _)))(1, 2, 3, 4, 5) 
     print map(_ + 1, [1, 2, 3, 4])
+    print str(_.split(","))
+    print (_.split(","))("test,nadeko")
 
