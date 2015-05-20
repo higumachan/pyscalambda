@@ -33,8 +33,11 @@ class Underscore(object):
     def __mul__(self, other):
         return self.do(other, "*")
 
-    def __floordiv__(self, other):
+    def __div__(self, other):
         return self.do(other, "/")
+
+    def __floordiv__(self, other):
+        return self.do(other, "//")
 
     def __mod__(self, other):
         return self.do(other, "%")
@@ -84,8 +87,11 @@ class Underscore(object):
     def __rmul__(self, other):
         return self.rdo(other, "*")
 
-    def __rfloordiv__(self, other):
+    def __rdiv__(self, other):
         return self.rdo(other, "/")
+
+    def __rfloordiv__(self, other):
+        return self.rdo(other, "//")
 
     def __rmod__(self, other):
         return self.rdo(other, "%")
