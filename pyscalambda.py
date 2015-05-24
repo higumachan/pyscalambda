@@ -26,6 +26,7 @@ def dropWhile(f, xs):
 class Formula(object):
     def __init__(self):
         self.cache_lambda = None
+        self.cache_consts = None
 
     def __str__(self):
         rp_form = self.create_reverse_polish_nation()
@@ -84,13 +85,13 @@ class Formula(object):
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
-        rp_form = self.create_reverse_polish_nation()
-        binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
-        ___CONSTS___ = dict(binds)
         if self.cache_lambda == None:
+            rp_form = self.create_reverse_polish_nation()
+            binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
+            self.cache_consts = dict(binds)
             lambda_string = self.create_lambda_string(rp_form)
             self.cache_lambda = eval(lambda_string)
-        return self.cache_lambda(___CONSTS___, *args)
+        return self.cache_lambda(self.cache_consts, *args)
         
 
     def do_operator2(self, other, operator):
@@ -328,4 +329,6 @@ if __name__ == '__main__':
     def test(x):
         return 100 + x
     print (scalambdable_func(test)(10) + _)(1000)
+    l = _ + 1
+    print map(l, [1, 2, 3, 4])
 
