@@ -258,15 +258,14 @@ class Operator2(Formula):
     def traverse(self):
         return self.left.traverse() + self.right.traverse() + [self.operator]
 
-n = 0
 class Operand(Formula):
+    COUNTER = 0
     def __init__(self, value):
         self.value = value
 
     def traverse(self):
-        global n
-        n += 1
-        return [("CONST_{}".format(n), self.value)]
+        Operand.COUNTER += 1
+        return [("CONST_{}".format(Operand.COUNTER), self.value)]
 
 class MethodCall(Formula):
     def __init__(self,value,  method, args, kwargs):
@@ -281,13 +280,14 @@ class MethodCall(Formula):
                 + ["mc__{}".format(len(self.args)) + self.method])
 
 class FunctionCall(Formula):
+    COUNTER = 0
     def __init__(self, func, args):
         self.func = func
         self.args = args
 
     def traverse(self):
         return (reduce(lambda n, x: n + x.traverse(), self.args, [])
-                + [("BINDFUNC_{}".format(n), self.func, len(self.args))])
+                + [("BINDFUNC_{}".format(FunctionCall.COUNTER), self.func, len(self.args))])
 
 
 class Underscore(Formula):
