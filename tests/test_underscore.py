@@ -54,7 +54,7 @@ class UnderscoreTest(TestCase):
         eq_(SF(len)(_)(range(100)), 100)
         eq_((SF(len)(_) + 1)([range(1), range(2), range(3)]), 4)
         eq_(map((SF(len)(_) + 1), [range(1), range(2), range(3)]), [2, 3, 4])
-        eq_(SF(test2)(_, 2) + 1(100), 104)
+        eq_((SF(test2)(_, 2) + 1)(100), 104)
 
     def test_readme(self):
         eq_(map(_ + 1, [1, 2, 3, 4]), [2, 3, 4, 5])
