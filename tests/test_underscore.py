@@ -53,3 +53,9 @@ class UnderscoreTest(TestCase):
         eq_((SF(len)(_) + 1)([range(1), range(2), range(3)]), 4)
         eq_(map((SF(len)(_) + 1), [range(1), range(2), range(3)]), [2, 3, 4])
 
+    def test_readme(self):
+        eq_(map(_ + 1, [1, 2, 3, 4]), [2, 3, 4, 5])
+        eq_(filter(_.isdigit(), "ab123aad"), "123")
+        eq_(reduce(_ + _, [1, 2, 3, 4]), 10)
+        eq_(map(SF(len)(_) + 1, [[1], [1, 2], [1, 2, 3]]), [2, 3, 4])
+
