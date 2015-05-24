@@ -1,5 +1,4 @@
-import functools
-
+import functools 
 OPERATOR2 = ["+", "-", "*", "/",
         "%", "<", "<=", ">", ">=",
         "==", "!=", "**"]
@@ -49,7 +48,15 @@ class Formula(object):
                 stack.append("{}{}".format(t[1:], a))
             elif isinstance(t, tuple):
                 print t
-                stack.append("___CONSTS___['{}']".format(t[0]))
+                if (t[0].startswith("BINDFUNC_")):
+                    args_count = t[1].func_code.co_argcount
+                    args = [stack.pop() for i in range(args_count)]
+                    stack.append("___CONSTS___['{}']({})".format(
+                        t[0],
+                        ",".join(reversed(args)),
+                        ))
+                else:
+                    stack.append("___CONSTS___['{}']".format(t[0]))
             elif t.startswith("mc__"):
                 args_count = get_args_count(t, "mc__")
                 args = [stack.pop() for i in range(args_count)]
@@ -290,7 +297,7 @@ class FunctionCall(Formula):
 
     def traverse(self):
         return (reduce(lambda n, x: n + x.traverse(), self.args, [])
-                + ["fc__{}".format(len(self.args)) + self.func.__name__])
+                + [("BINDFUNC_{}".format(n), self.func)])
 
 class Const(Formula):
     def __init__(self, name):
@@ -315,6 +322,7 @@ def scalambdable_func(f):
     return wraps
 
 _ = Underscore()
+SF = scalambdable_func
 
 if __name__ == '__main__':
     class ct:
