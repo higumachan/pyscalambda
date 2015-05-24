@@ -25,7 +25,7 @@ def dropWhile(f, xs):
 
 class Formula(object):
     def __init__(self):
-        pass
+        self.cache_lambda = None
 
     def __str__(self):
         rp_form = self.create_reverse_polish_nation()
@@ -85,11 +85,12 @@ class Formula(object):
 
     def __call__(self, *args):
         rp_form = self.create_reverse_polish_nation()
-        lambda_string = self.create_lambda_string(rp_form)
         binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
         ___CONSTS___ = dict(binds)
-        f = eval(lambda_string)
-        return f(___CONSTS___, *args)
+        if self.cache_lambda == None:
+            lambda_string = self.create_lambda_string(rp_form)
+            self.cache_lambda = eval(lambda_string)
+        return self.cache_lambda(___CONSTS___, *args)
         
 
     def do_operator2(self, other, operator):
@@ -243,6 +244,7 @@ class Formula(object):
 
 class Operator1(Formula):
     def __init__(self, operator, value):
+        super(Operator1, self).__init__()
         self.operator = operator
         self.value = value
 
@@ -251,6 +253,7 @@ class Operator1(Formula):
 
 class Operator2(Formula):
     def __init__(self, operator, left, right):
+        super(Operator2, self).__init__()
         self.operator = operator
         self.left = left
         self.right = right
@@ -261,6 +264,7 @@ class Operator2(Formula):
 class Operand(Formula):
     COUNTER = 0
     def __init__(self, value):
+        super(Operand, self).__init__()
         self.value = value
 
     def traverse(self):
@@ -269,6 +273,7 @@ class Operand(Formula):
 
 class MethodCall(Formula):
     def __init__(self,value,  method, args, kwargs):
+        super(MethodCall, self).__init__()
         self.value = value
         self.method = method
         self.args = args
@@ -282,6 +287,7 @@ class MethodCall(Formula):
 class FunctionCall(Formula):
     COUNTER = 0
     def __init__(self, func, args):
+        super(FunctionCall, self).__init__()
         self.func = func
         self.args = args
 
@@ -292,6 +298,7 @@ class FunctionCall(Formula):
 
 class Underscore(Formula):
     def __init__(self):
+        super(Underscore, self).__init__()
         pass
     
     def traverse(self):
