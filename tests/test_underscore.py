@@ -45,9 +45,9 @@ class UnderscoreTest(TestCase):
         eq_(("_a" + _)("test"), "_atest")
 
     def test_scalambdable_func(self):
-        eq_(SF(len)(_)([1, 2, 3]), 3)
-        eq_(SF(len)(_)(range(100)), 100)
         def test(x):
             return 100 + x
         eq_((SF(test)(10) + _)(1000), 1110)
+        eq_(SF(len)(_)([1, 2, 3]), 3)
+        eq_(SF(len)(_)(range(100)), 100)
 

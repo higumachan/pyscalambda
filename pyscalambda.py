@@ -49,7 +49,7 @@ class Formula(object):
             elif isinstance(t, tuple):
                 print t
                 if (t[0].startswith("BINDFUNC_")):
-                    args_count = t[1].func_code.co_argcount
+                    args_count = t[2]
                     args = [stack.pop() for i in range(args_count)]
                     stack.append("___CONSTS___['{}']({})".format(
                         t[0],
@@ -94,7 +94,7 @@ class Formula(object):
     def __call__(self, *args):
         rp_form = self.create_reverse_polish_nation()
         lambda_string = self.create_lambda_string(rp_form)
-        binds = filter(lambda x: isinstance(x, tuple), rp_form)
+        binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
         ___CONSTS___ = dict(binds)
         print lambda_string
         print ___CONSTS___
@@ -297,7 +297,7 @@ class FunctionCall(Formula):
 
     def traverse(self):
         return (reduce(lambda n, x: n + x.traverse(), self.args, [])
-                + [("BINDFUNC_{}".format(n), self.func)])
+                + [("BINDFUNC_{}".format(n), self.func, len(self.args))])
 
 class Const(Formula):
     def __init__(self, name):
