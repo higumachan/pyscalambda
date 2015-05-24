@@ -1,7 +1,6 @@
 from unittest import TestCase
 from nose.tools import ok_, eq_
-from pyscalambda import _
-
+from pyscalambda import _, SF
 
 class UnderscoreTest(TestCase):
     def test_identity(self):
@@ -44,4 +43,11 @@ class UnderscoreTest(TestCase):
 
     def test_bug_case1(self):
         eq_(("_a" + _)("test"), "_atest")
+
+    def test_scalambdable_func(self):
+        eq_(SF(len)(_)([1, 2, 3]), 3)
+        eq_(SF(len)(_)(range(100)), 100)
+        def test(x):
+            return 100 + x
+        eq_((SF(test)(10) + _)(1000), 1110)
 
