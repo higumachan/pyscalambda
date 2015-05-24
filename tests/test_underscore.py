@@ -1,6 +1,7 @@
 from unittest import TestCase
 from nose.tools import ok_, eq_
-from underscore import _
+from pyscalambda import _
+
 
 class UnderscoreTest(TestCase):
     def test_identity(self):
@@ -37,5 +38,10 @@ class UnderscoreTest(TestCase):
         eq_((_ + " is " + _)("nadeko", "cute"), "nadeko is cute")
         eq_((_ * _)("nadeko", 4), "nadeko" * 4)
 
+    def test_already_bindings(self):
+        x = 1
+        eq_((_ + x)(1), 2)
+
     def test_bug_case1(self):
         eq_(("_a" + _)("test"), "_atest")
+
