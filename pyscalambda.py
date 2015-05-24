@@ -63,12 +63,6 @@ class Formula(object):
                     a,
                     dropWhile(lambda x: x.isdigit(), t[4:]),
                     ",".join(reversed(args))))
-            elif t.startswith("fc__"):
-                args_count = get_args_count(t, "fc__")
-                args = [stack.pop() for i in range(args_count)]
-                stack.append("{}({})".format(
-                    dropWhile(lambda x: x.isdigit(), t[4:]),
-                    ",".join(reversed(args))))
             else:
                 stack.append(t)
         return stack[0]
@@ -295,16 +289,8 @@ class FunctionCall(Formula):
         return (reduce(lambda n, x: n + x.traverse(), self.args, [])
                 + [("BINDFUNC_{}".format(n), self.func, len(self.args))])
 
-class Const(Formula):
-    def __init__(self, name):
-        self.name = name
-
-    def traverse(self):
-        return ["__CONST{}__".format(self.name)]
-
 
 class Underscore(Formula):
-
     def __init__(self):
         pass
     
