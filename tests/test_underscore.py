@@ -50,4 +50,6 @@ class UnderscoreTest(TestCase):
         eq_((SF(test)(10) + _)(1000), 1110)
         eq_(SF(len)(_)([1, 2, 3]), 3)
         eq_(SF(len)(_)(range(100)), 100)
+        eq_((SF(len)(_) + 1)([range(1), range(2), range(3)]), 4)
+        eq_(map((SF(len)(_) + 1), [range(1), range(2), range(3)]), [2, 3, 4])
 
