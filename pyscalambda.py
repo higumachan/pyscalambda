@@ -29,7 +29,6 @@ class Formula(object):
 
     def __str__(self):
         rp_form = self.create_reverse_polish_nation()
-        print rp_form
         return self.create_lambda_string(rp_form)
 
     @classmethod
@@ -47,7 +46,6 @@ class Formula(object):
                 a = stack.pop()
                 stack.append("{}{}".format(t[1:], a))
             elif isinstance(t, tuple):
-                print t
                 if (t[0].startswith("BINDFUNC_")):
                     args_count = t[2]
                     args = [stack.pop() for i in range(args_count)]
@@ -96,8 +94,6 @@ class Formula(object):
         lambda_string = self.create_lambda_string(rp_form)
         binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
         ___CONSTS___ = dict(binds)
-        print lambda_string
-        print ___CONSTS___
         f = eval(lambda_string)
         return f(___CONSTS___, *args)
         
