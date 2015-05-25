@@ -64,6 +64,10 @@ class Formula(object):
                     a,
                     dropWhile(lambda x: x.isdigit(), t[4:]),
                     ",".join(reversed(args))))
+            elif t == "__gi__":
+                d = stack.pop()
+                key = stack.pop()
+                stack.append("{}[{}]".format(key, d))
             else:
                 stack.append(t)
         return stack[0]
@@ -106,6 +110,11 @@ class Formula(object):
 
     def do_operator1(self, operator):
         return Operator1(operator, self)
+
+    def do_getitem(self, item):
+        if not issubclass(item.__class__, Formula):
+            item = Operand(item)
+        return GetItem(self, item)
 
     @classmethod
     def convert_oprand(cls, x):
@@ -242,6 +251,9 @@ class Formula(object):
     def __getattr__(self, method):
         return self.do_methodcall(method)
 
+    def __getitem__(self, key):
+        return self.do_getitem(key)
+
 
 class Operator1(Formula):
     def __init__(self, operator, value):
@@ -284,6 +296,17 @@ class MethodCall(Formula):
         return (self.value.traverse() + 
                 reduce(lambda n, x: n + x.traverse(), self.args, [])
                 + ["mc__{}".format(len(self.args)) + self.method])
+
+class GetItem(Formula):
+    def __init__(self, value, item):
+        super(GetItem, self).__init__()
+        self.value = value
+        self.item = item
+
+    def traverse(self):
+        return (self.value.traverse() + 
+                self.item.traverse() + 
+                ["__gi__"])
 
 class FunctionCall(Formula):
     COUNTER = 0
@@ -331,4 +354,5 @@ if __name__ == '__main__':
     print (scalambdable_func(test)(10) + _)(1000)
     l = _ + 1
     print map(l, [1, 2, 3, 4])
+    print _[1]
 
