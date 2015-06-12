@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='pyscalambda',
-    version='0.1.2',
+    version='0.1.3',
     description='Use scala style lambda formula.',
     author='higumachan',
     author_email='harekumo792154@gmail.com',
