@@ -1,5 +1,5 @@
 from unittest import TestCase
-from nose.tools import ok_, eq_
+from nose.tools import eq_
 from pyscalambda import _, SF
 
 class UnderscoreTest(TestCase):
@@ -44,6 +44,21 @@ class UnderscoreTest(TestCase):
     def test_bug_case1(self):
         eq_(("_a" + _)("test"), "_atest")
 
+    def test_bug_case2(self):
+        def A(object):
+            def __init__(self, x):
+                self.x = x
+
+        def B(object):
+            def __init__(self):
+                pass
+            def f(self, x):
+                return A(x)
+        a = A(100)
+        b = B(100)
+        eq_((_.x)(a), 100)
+        eq_((_.f().x)(b), 100)
+
     def test_scalambdable_func(self):
         def test(x):
             return 100 + x
@@ -65,3 +80,12 @@ class UnderscoreTest(TestCase):
     def test_high_stress(self):
         for i in range(6):
             eq_(map(_ + 10, xrange(10 ** i)), range(10, 10 ** i + 10))
+
+    def test_getitem(self):
+        eq_(_[0]([1, 2, 3]), 1)
+        eq_(_[1]([1, 2, 3]), 2)
+        eq_(_[2]([1, 2, 3]), 3)
+
+    def test_geteditem(self):
+        eq_([1, 2][_](1), 2)
+        eq_({1: 1, 2: 2}[_](1), 1)

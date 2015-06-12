@@ -1,7 +1,7 @@
-import functools 
+import functools
 OPERATOR2 = ["+", "-", "*", "/",
         "%", "<", "<=", ">", ">=",
-        "==", "!=", "**"]
+        "==", "!=", "**", "&", "|", "^"]
 
 OPERATOR1 = [
     "'+", "'-", "'~"
@@ -21,7 +21,7 @@ def takeWhile(f, xs):
 
 def dropWhile(f, xs):
     return splitWhile(f, xs)[1]
-    
+
 
 class Formula(object):
     def __init__(self):
@@ -96,7 +96,7 @@ class Formula(object):
             lambda_string = self.create_lambda_string(rp_form)
             self.cache_lambda = eval(lambda_string)
         return self.cache_lambda(self.cache_consts, *args)
-        
+
 
     def do_operator2(self, other, operator):
         if not issubclass(other.__class__, Formula):
@@ -124,7 +124,7 @@ class Formula(object):
 
     def do_methodcall(self, method):
         def f(*args, **kwargs):
-            return MethodCall(self, method, 
+            return MethodCall(self, method,
                     map(Formula.convert_oprand, args),
                     vmap(Formula.convert_oprand, kwargs))
         return f
@@ -147,7 +147,7 @@ class Formula(object):
 
     def __mod__(self, other):
         return self.do_operator2(other, "%")
-    
+
     def __lt__(self, other):
         return self.do_operator2(other, "<")
 
@@ -176,13 +176,13 @@ class Formula(object):
         return self.do_operator2(other, ">>")
 
     def __and__(self, other):
-        return self.do_operator2(other, "and")
+        return self.do_operator2(other, "&")
 
     def __or__(self, other):
-        return self.do_operator2(other, "or")
+        return self.do_operator2(other, "|")
 
     def __xor__(self, other):
-        return self.do_operator2(other, "xor")
+        return self.do_operator2(other, "^")
 
     def __radd__(self, other):
         return self.rdo_operator2(other, "+")
@@ -201,7 +201,7 @@ class Formula(object):
 
     def __rmod__(self, other):
         return self.rdo_operator2(other, "%")
-    
+
     def __rlt__(self, other):
         return self.rdo_operator2(other, "<")
 
@@ -230,13 +230,13 @@ class Formula(object):
         return self.rdo_operator2(other, ">>")
 
     def __rand__(self, other):
-        return self.rdo_operator2(other, "and")
+        return self.rdo_operator2(other, "&")
 
     def __ror__(self, other):
-        return self.rdo_operator2(other, "or")
+        return self.rdo_operator2(other, "|")
 
     def __rxor__(self, other):
-        return self.rdo_operator2(other, "xor")
+        return self.rdo_operator2(other, "^")
 #%}}}
 
     def __pos__(self):
@@ -293,7 +293,7 @@ class MethodCall(Formula):
         self.kwargs = kwargs
 
     def traverse(self):
-        return (self.value.traverse() + 
+        return (self.value.traverse() +
                 reduce(lambda n, x: n + x.traverse(), self.args, [])
                 + ["mc__{}".format(len(self.args)) + self.method])
 
@@ -304,8 +304,8 @@ class GetItem(Formula):
         self.item = item
 
     def traverse(self):
-        return (self.value.traverse() + 
-                self.item.traverse() + 
+        return (self.value.traverse() +
+                self.item.traverse() +
                 ["__gi__"])
 
 class FunctionCall(Formula):
@@ -324,7 +324,7 @@ class Underscore(Formula):
     def __init__(self):
         super(Underscore, self).__init__()
         pass
-    
+
     def traverse(self):
         return ["___ARG___"]
 
@@ -355,4 +355,3 @@ if __name__ == '__main__':
     l = _ + 1
     print map(l, [1, 2, 3, 4])
     print _[1]
-
