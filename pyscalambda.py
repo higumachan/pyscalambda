@@ -12,7 +12,7 @@ def vmap(f, dic):
 
 def splitWhile(f, xs):
     for i in range(len(xs)):
-        if (not f(xs[i])):
+        if not f(xs[i]):
             return (xs[:i], xs[i:])
     return (xs, [])
 
@@ -47,7 +47,7 @@ class Formula(object):
                 a = stack.pop()
                 stack.append("{}{}".format(t[1:], a))
             elif isinstance(t, tuple):
-                if (t[0].startswith("BINDFUNC_")):
+                if t[0].startswith("BINDFUNC_"):
                     args_count = t[2]
                     args = [stack.pop() for i in range(args_count)]
                     stack.append("___CONSTS___['{}']({})".format(
