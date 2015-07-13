@@ -1,11 +1,11 @@
 import functools
-OPERATOR2 = ["+", "-", "*", "/",
+OPERATOR2 = frozenset(["+", "-", "*", "/",
         "%", "<", "<=", ">", ">=",
-        "==", "!=", "**", "&", "|", "^"]
+        "==", "!=", "**", "&", "|", "^"])
 
-OPERATOR1 = [
+OPERATOR1 = frozenset([
     "'+", "'-", "'~"
-]
+])
 
 def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
@@ -39,14 +39,7 @@ class Formula(object):
 
         stack = []
         for t in rpf:
-            if t in OPERATOR2:
-                a = stack.pop()
-                b = stack.pop()
-                stack.append("({}{}{})".format(b, t, a))
-            elif t in OPERATOR1:
-                a = stack.pop()
-                stack.append("{}{}".format(t[1:], a))
-            elif isinstance(t, tuple):
+            if isinstance(t, tuple):
                 if (t[0].startswith("BINDFUNC_")):
                     args_count = t[2]
                     args = [stack.pop() for i in range(args_count)]
@@ -56,6 +49,13 @@ class Formula(object):
                         ))
                 else:
                     stack.append("___CONSTS___['{}']".format(t[0]))
+            elif t in OPERATOR2:
+                a = stack.pop()
+                b = stack.pop()
+                stack.append("({}{}{})".format(b, t, a))
+            elif t in OPERATOR1:
+                a = stack.pop()
+                stack.append("{}{}".format(t[1:], a))
             elif t.startswith("mc__"):
                 args_count = get_args_count(t, "mc__")
                 args = [stack.pop() for i in range(args_count)]
