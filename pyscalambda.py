@@ -89,7 +89,7 @@ class Formula(object):
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
-        if self.cache_lambda == None:
+        if self.cache_lambda is None:
             rp_form = self.create_reverse_polish_nation()
             binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
             self.cache_consts = dict(binds)
