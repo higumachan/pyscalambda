@@ -1,11 +1,11 @@
 import functools
-OPERATOR2 = ["+", "-", "*", "/",
+OPERATOR2 = frozenset(["+", "-", "*", "/",
         "%", "<", "<=", ">", ">=",
-        "==", "!=", "**", "&", "|", "^"]
+        "==", "!=", "**", "&", "|", "^"])
 
-OPERATOR1 = [
+OPERATOR1 = frozenset([
     "'+", "'-", "'~"
-]
+])
 
 def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
