@@ -35,7 +35,7 @@ class Formula(object):
     @classmethod
     def parse(cls, rpf):
         def get_args_count(t, prefix):
-            return int(takeWhile(lambda x: x.isdigit(), t[len(prefix):]))
+            return int(takeWhile(lambda x: x.isdigit(), t[len(prefix):]), base=10)
 
         stack = []
         for t in rpf:
