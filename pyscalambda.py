@@ -24,6 +24,8 @@ def dropWhile(f, xs):
 
 
 class Formula(object):
+    __slots__ = ["cache_lambda", "cache_consts"]
+
     def __init__(self):
         self.cache_lambda = None
         self.cache_consts = None
@@ -256,6 +258,8 @@ class Formula(object):
 
 
 class Operator1(Formula):
+    __slots__ = ["operator", "value"]
+
     def __init__(self, operator, value):
         super(Operator1, self).__init__()
         self.operator = operator
@@ -265,6 +269,8 @@ class Operator1(Formula):
         return self.value.traverse() + ["'" + self.operator]
 
 class Operator2(Formula):
+    __slots__ = ["operator", "left", "right"]
+
     def __init__(self, operator, left, right):
         super(Operator2, self).__init__()
         self.operator = operator
@@ -275,7 +281,9 @@ class Operator2(Formula):
         return self.left.traverse() + self.right.traverse() + [self.operator]
 
 class Operand(Formula):
+    __slots__ = ["value"]
     COUNTER = 0
+
     def __init__(self, value):
         super(Operand, self).__init__()
         self.value = value
@@ -285,6 +293,8 @@ class Operand(Formula):
         return [("CONST_{}".format(Operand.COUNTER), self.value)]
 
 class MethodCall(Formula):
+    __slots__ = ["value", "method", "args", "kwargs"]
+
     def __init__(self,value,  method, args, kwargs):
         super(MethodCall, self).__init__()
         self.value = value
@@ -298,6 +308,8 @@ class MethodCall(Formula):
                 + ["mc__{}".format(len(self.args)) + self.method])
 
 class GetItem(Formula):
+    __slots__ = ["value", "item"]
+
     def __init__(self, value, item):
         super(GetItem, self).__init__()
         self.value = value
@@ -309,7 +321,9 @@ class GetItem(Formula):
                 ["__gi__"])
 
 class FunctionCall(Formula):
+    __slots__ = ["func", "args"]
     COUNTER = 0
+
     def __init__(self, func, args):
         super(FunctionCall, self).__init__()
         self.func = func
