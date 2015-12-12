@@ -12,7 +12,7 @@ def vmap(f, dic):
 
 def splitWhile(f, xs):
     for i in range(len(xs)):
-        if (not f(xs[i])):
+        if not f(xs[i]):
             return (xs[:i], xs[i:])
     return (xs, [])
 
@@ -47,7 +47,7 @@ class Formula(object):
                 a = stack.pop()
                 stack.append("{}{}".format(t[1:], a))
             elif isinstance(t, tuple):
-                if (t[0].startswith("BINDFUNC_")):
+                if t[0].startswith("BINDFUNC_"):
                     args_count = t[2]
                     args = [stack.pop() for i in range(args_count)]
                     stack.append("___CONSTS___['{}']({})".format(
@@ -89,7 +89,7 @@ class Formula(object):
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
-        if self.cache_lambda == None:
+        if self.cache_lambda is None:
             rp_form = self.create_reverse_polish_nation()
             binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
             self.cache_consts = dict(binds)
