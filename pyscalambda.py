@@ -38,38 +38,40 @@ class Formula(object):
             return int(takeWhile(lambda x: x.isdigit(), t[len(prefix):]), base=10)
 
         stack = []
+        fetch = stack.pop
+        push  = stack.append
         for t in rpf:
             if t in OPERATOR2:
-                a = stack.pop()
-                b = stack.pop()
-                stack.append("({}{}{})".format(b, t, a))
+                a = fetch()
+                b = fetch()
+                push("({}{}{})".format(b, t, a))
             elif t in OPERATOR1:
-                a = stack.pop()
-                stack.append("{}{}".format(t[1:], a))
+                a = fetch()
+                push("{}{}".format(t[1:], a))
             elif isinstance(t, tuple):
                 if t[0].startswith("BINDFUNC_"):
                     args_count = t[2]
-                    args = [stack.pop() for i in range(args_count)]
-                    stack.append("___CONSTS___['{}']({})".format(
+                    args = [fetch() for i in range(args_count)]
+                    push("___CONSTS___['{}']({})".format(
                         t[0],
                         ",".join(reversed(args)),
                         ))
                 else:
-                    stack.append("___CONSTS___['{}']".format(t[0]))
+                    push("___CONSTS___['{}']".format(t[0]))
             elif t.startswith("mc__"):
                 args_count = get_args_count(t, "mc__")
-                args = [stack.pop() for i in range(args_count)]
-                a = stack.pop()
-                stack.append("{}.{}({})".format(
+                args = [fetch() for i in range(args_count)]
+                a = fetch()
+                push("{}.{}({})".format(
                     a,
                     dropWhile(lambda x: x.isdigit(), t[4:]),
                     ",".join(reversed(args))))
             elif t == "__gi__":
-                d = stack.pop()
-                key = stack.pop()
-                stack.append("{}[{}]".format(key, d))
+                d = fetch()
+                key = fetch()
+                push("{}[{}]".format(key, d))
             else:
-                stack.append(t)
+                push(t)
         return stack[0]
 
     def create_reverse_polish_nation(self):
