@@ -21,16 +21,16 @@ class Formula(object):
     def create_lambda_string(self):
         traversed = list(self.traverse())
         body = "".join(traversed)
-        args = "___CONSTS___,{}".format(",".join(self.traverse_args()))
+        args = ",".join(self.traverse_args())
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
         if self.cache_lambda is None:
             binds = self.traverse_const_values()
-            self.cache_consts = dict(binds)
+            #self.cache_consts = dict(binds)
             lambda_string = self.create_lambda_string()
-            self.cache_lambda = eval(lambda_string)
-        return self.cache_lambda(self.cache_consts, *args)
+            self.cache_lambda = eval(lambda_string, dict(binds))
+        return self.cache_lambda(*args)
 
     @classmethod
     def convert_oprand(cls, x):
@@ -246,7 +246,7 @@ class Operand(Formula):
 
     def traverse(self):
         yield '('
-        yield "___CONSTS___['CONST_{}']".format(self.id)
+        yield "CONST_{}".format(self.id)
         yield ')'
 
     def traverse_const_values(self):
@@ -314,7 +314,7 @@ class FunctionCall(Formula):
         self.children = self.args + self.kwargs.values()
 
     def traverse(self):
-        yield "___CONSTS___['BIND_FUNC_{}']".format(self.id)
+        yield "BIND_FUNC_{}".format(self.id)
         yield '('
         for arg in self.args:
             for t in arg.traverse():
@@ -379,3 +379,4 @@ if __name__ == '__main__':
     print (_[1])([1, 2, 3])
     print (1 + 2 + _ + 3)(10)
     print (1 + 2 + _ + 3 + _)(10, 12)
+    print globals() 
