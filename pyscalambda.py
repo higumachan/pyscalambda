@@ -1,125 +1,77 @@
 import functools
-OPERATOR2 = ["+", "-", "*", "/",
-        "%", "<", "<=", ">", ">=",
-        "==", "!=", "**", "&", "|", "^"]
 
-OPERATOR1 = [
-    "'+", "'-", "'~"
-]
 
 def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
-
-def splitWhile(f, xs):
-    for i in range(len(xs)):
-        if (not f(xs[i])):
-            return (xs[:i], xs[i:])
-    return (xs, [])
-
-def takeWhile(f, xs):
-    return splitWhile(f, xs)[0]
-
-def dropWhile(f, xs):
-    return splitWhile(f, xs)[1]
-
 
 class Formula(object):
     def __init__(self):
         self.cache_lambda = None
         self.cache_consts = None
+        self.children = []
 
     def __str__(self):
-        rp_form = self.create_reverse_polish_nation()
-        return self.create_lambda_string(rp_form)
+        return self.create_lambda_string()
 
-    @classmethod
-    def parse(cls, rpf):
-        def get_args_count(t, prefix):
-            return int(takeWhile(lambda x: x.isdigit(), t[len(prefix):]))
-
-        stack = []
-        for t in rpf:
-            if t in OPERATOR2:
-                a = stack.pop()
-                b = stack.pop()
-                stack.append("({}{}{})".format(b, t, a))
-            elif t in OPERATOR1:
-                a = stack.pop()
-                stack.append("{}{}".format(t[1:], a))
-            elif isinstance(t, tuple):
-                if (t[0].startswith("BINDFUNC_")):
-                    args_count = t[2]
-                    args = [stack.pop() for i in range(args_count)]
-                    stack.append("___CONSTS___['{}']({})".format(
-                        t[0],
-                        ",".join(reversed(args)),
-                        ))
-                else:
-                    stack.append("___CONSTS___['{}']".format(t[0]))
-            elif t.startswith("mc__"):
-                args_count = get_args_count(t, "mc__")
-                args = [stack.pop() for i in range(args_count)]
-                a = stack.pop()
-                stack.append("{}.{}({})".format(
-                    a,
-                    dropWhile(lambda x: x.isdigit(), t[4:]),
-                    ",".join(reversed(args))))
-            elif t == "__gi__":
-                d = stack.pop()
-                key = stack.pop()
-                stack.append("{}[{}]".format(key, d))
-            else:
-                stack.append(t)
-        return stack[0]
-
-    def create_reverse_polish_nation(self):
-        c = [0]
-        def us2args(x):
-            if x == "___ARG___":
-                k = c[0]
-                c[0] += 1
-                return "___ARG{}___".format(k)
-            return x
-        return map(us2args, self.traverse())
+    def debug(self):
+        print self.create_lambda_string()
+        print list(self.traverse_const_values())
 
 
-    def create_lambda_string(self, rp_form):
-        body = Formula.parse(rp_form)
-        args = ",".join(["___CONSTS___"] + filter(lambda x: not isinstance(x, tuple) and x.startswith("___") and x.endswith("___"), rp_form))
+    def create_lambda_string(self):
+        traversed = list(self.traverse())
+        body = "".join(traversed)
+        args = "___CONSTS___,{}".format(",".join(self.traverse_args()))
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
-        if self.cache_lambda == None:
-            rp_form = self.create_reverse_polish_nation()
-            binds = map(lambda x: (x[0], x[1]) if len(x) == 3 else x, filter(lambda x: isinstance(x, tuple), rp_form))
+        if self.cache_lambda is None:
+            binds = self.traverse_const_values()
             self.cache_consts = dict(binds)
-            lambda_string = self.create_lambda_string(rp_form)
+            lambda_string = self.create_lambda_string()
             self.cache_lambda = eval(lambda_string)
         return self.cache_lambda(self.cache_consts, *args)
-
 
     def do_operator2(self, other, operator):
         if not issubclass(other.__class__, Formula):
             other = Operand(other)
-        return Operator2(operator, self, other)
+        if isinstance(other, Underscore):
+            other = Underscore()
+        this = self
+        if isinstance(this, Underscore):
+            this = Underscore()
+        return Operator2(operator, this, other)
 
     def rdo_operator2(self, other, operator):
         if not issubclass(other.__class__, Formula):
             other = Operand(other)
-        return Operator2(operator, other, self)
+        if isinstance(other, Underscore):
+            other = Underscore()
+        this = self
+        if isinstance(this, Underscore):
+            this = Underscore()
+        return Operator2(operator, other, this)
 
     def do_operator1(self, operator):
-        return Operator1(operator, self)
+        this = self
+        if isinstance(this, Underscore):
+            this = Underscore()
+        return Operator1(operator, this)
 
     def do_getitem(self, item):
         if not issubclass(item.__class__, Formula):
             item = Operand(item)
-        return GetItem(self, item)
+        this = self
+        if isinstance(this, Underscore):
+            this = Underscore()
+        return GetItem(this, item)
 
     @classmethod
     def convert_oprand(cls, x):
         if not issubclass(x.__class__, Formula):
             return Operand(x)
+        if isinstance(x, Underscore):
+            return Underscore()
         return x
 
     def do_methodcall(self, method):
@@ -254,15 +206,32 @@ class Formula(object):
     def __getitem__(self, key):
         return self.do_getitem(key)
 
+    def traverse_const_values(self):
+        for child in self.children:
+            for t in child.traverse_const_values():
+                yield t
+
+    def traverse_args(self):
+        for child in self.children:
+            for t in child.traverse_args():
+                yield t
+
 
 class Operator1(Formula):
     def __init__(self, operator, value):
         super(Operator1, self).__init__()
         self.operator = operator
         self.value = value
+        self.children = [self.value]
 
     def traverse(self):
-        return self.value.traverse() + ["'" + self.operator]
+        yield '('
+        yield self.operator
+        for t in self.value.traverse():
+            yield t
+        yield ')'
+
+
 
 class Operator2(Formula):
     def __init__(self, operator, left, right):
@@ -270,68 +239,136 @@ class Operator2(Formula):
         self.operator = operator
         self.left = left
         self.right = right
+        self.children = [self.left, self.right]
 
     def traverse(self):
-        return self.left.traverse() + self.right.traverse() + [self.operator]
+        yield '('
+        for t in self.left.traverse():
+            yield t
+        yield self.operator
+        for t in self.right.traverse():
+            yield t
+        yield ')'
 
 class Operand(Formula):
     COUNTER = 0
+
     def __init__(self, value):
         super(Operand, self).__init__()
+        self.id = Operand.COUNTER
+        Operand.COUNTER += 1
         self.value = value
 
     def traverse(self):
-        Operand.COUNTER += 1
-        return [("CONST_{}".format(Operand.COUNTER), self.value)]
+        yield '('
+        yield "___CONSTS___['CONST_{}']".format(self.id)
+        yield ')'
+
+    def traverse_const_values(self):
+        yield ('CONST_{}'.format(self.id), self.value)
+
 
 class MethodCall(Formula):
-    def __init__(self,value,  method, args, kwargs):
+    def __init__(self, value,  method, args, kwargs):
         super(MethodCall, self).__init__()
         self.value = value
         self.method = method
         self.args = args
         self.kwargs = kwargs
+        self.children = [self.value] + self.args + self.kwargs.values()
 
     def traverse(self):
-        return (self.value.traverse() +
-                reduce(lambda n, x: n + x.traverse(), self.args, [])
-                + ["mc__{}".format(len(self.args)) + self.method])
+        yield '('
+        for t in self.value.traverse():
+            yield t
+        yield '.'
+        yield self.method
+        yield '('
+        print self.args
+        for arg in self.args:
+            for t in arg.traverse():
+                yield t
+            yield ','
+        for name, arg in self.kwargs:
+            yield '{}='.format(name)
+            for t in self.arg.traverse():
+                yield t
+            yield ','
+        yield ')'
+        yield ')'
+
 
 class GetItem(Formula):
     def __init__(self, value, item):
         super(GetItem, self).__init__()
         self.value = value
         self.item = item
+        self.children = [self.value, self.item]
 
     def traverse(self):
-        return (self.value.traverse() +
-                self.item.traverse() +
-                ["__gi__"])
+        yield '('
+        for t in self.value.traverse():
+            yield t
+        yield '['
+        for t in self.item.traverse():
+            yield t
+        yield ']'
+        yield ')'
+
 
 class FunctionCall(Formula):
     COUNTER = 0
-    def __init__(self, func, args):
+
+    def __init__(self, func, args, kwargs):
         super(FunctionCall, self).__init__()
+        self.id = FunctionCall.COUNTER 
+        FunctionCall.COUNTER += 1
         self.func = func
         self.args = args
+        self.kwargs = kwargs
+        self.children = self.args + self.kwargs.values()
 
     def traverse(self):
-        return (reduce(lambda n, x: n + x.traverse(), self.args, [])
-                + [("BINDFUNC_{}".format(FunctionCall.COUNTER), self.func, len(self.args))])
+        yield "___CONSTS___['BIND_FUNC_{}']".format(self.id)
+        yield '('
+        for arg in self.args:
+            for t in arg.traverse():
+                yield t
+            yield ','
+        for name, arg in self.kwargs:
+            yield '{}='.format(name)
+            for t in arg.traverse():
+                yield t
+            yield ','
+        yield ')'
+
+    def traverse_const_values(self):
+        yield ('BIND_FUNC_{}'.format(self.id), self.func)
+        for t in super(FunctionCall, self).traverse_const_values():
+            yield t
 
 
 class Underscore(Formula):
+    COUNTER = 0
+
     def __init__(self):
         super(Underscore, self).__init__()
-        pass
+        self.id = Underscore.COUNTER
+        Underscore.COUNTER += 1
 
     def traverse(self):
-        return ["___ARG___"]
+        yield '('
+        yield "___ARG{}___".format(self.id)
+        yield ')'
+
+    def traverse_args(self):
+        yield "___ARG{}___".format(self.id)
+
 
 def scalambdable_func(f):
     @functools.wraps(f)
     def wraps(*args, **kwargs):
-        return FunctionCall(f, map(Formula.convert_oprand, args))
+        return FunctionCall(f, map(Formula.convert_oprand, args), vmap(Formula.convert_oprand, kwargs))
     return wraps
 
 _ = Underscore()
@@ -354,4 +391,6 @@ if __name__ == '__main__':
     print (scalambdable_func(test)(10) + _)(1000)
     l = _ + 1
     print map(l, [1, 2, 3, 4])
-    print _[1]
+    print (_[1])([1, 2, 3])
+    print (1 + 2 + _ + 3)(10)
+    print (1 + 2 + _ + 3 + _)(10, 12)
