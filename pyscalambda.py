@@ -32,40 +32,6 @@ class Formula(object):
             self.cache_lambda = eval(lambda_string)
         return self.cache_lambda(self.cache_consts, *args)
 
-    def do_operator2(self, other, operator):
-        if not issubclass(other.__class__, Formula):
-            other = Operand(other)
-        if isinstance(other, Underscore):
-            other = Underscore()
-        this = self
-        if isinstance(this, Underscore):
-            this = Underscore()
-        return Operator2(operator, this, other)
-
-    def rdo_operator2(self, other, operator):
-        if not issubclass(other.__class__, Formula):
-            other = Operand(other)
-        if isinstance(other, Underscore):
-            other = Underscore()
-        this = self
-        if isinstance(this, Underscore):
-            this = Underscore()
-        return Operator2(operator, other, this)
-
-    def do_operator1(self, operator):
-        this = self
-        if isinstance(this, Underscore):
-            this = Underscore()
-        return Operator1(operator, this)
-
-    def do_getitem(self, item):
-        if not issubclass(item.__class__, Formula):
-            item = Operand(item)
-        this = self
-        if isinstance(this, Underscore):
-            this = Underscore()
-        return GetItem(this, item)
-
     @classmethod
     def convert_oprand(cls, x):
         if not issubclass(x.__class__, Formula):
@@ -73,6 +39,25 @@ class Formula(object):
         if isinstance(x, Underscore):
             return Underscore()
         return x
+
+    def do_operator2(self, other, operator):
+        this = Formula.convert_oprand(self)
+        other = Formula.convert_oprand(other)
+        return Operator2(operator, this, other)
+
+    def rdo_operator2(self, other, operator):
+        this = Formula.convert_oprand(self)
+        other = Formula.convert_oprand(other)
+        return Operator2(operator, other, this)
+
+    def do_operator1(self, operator):
+        this = Formula.convert_oprand(self)
+        return Operator1(operator, this)
+
+    def do_getitem(self, item):
+        this = Formula.convert_oprand(self)
+        item = Formula.convert_oprand(item)
+        return GetItem(this, item)
 
     def do_methodcall(self, method):
         def f(*args, **kwargs):
