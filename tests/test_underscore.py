@@ -1,5 +1,5 @@
 from unittest import TestCase
-from nose.tools import eq_, ok_
+from nose.tools import eq_, ok_, raises
 from pyscalambda import _, SF, _1, _2
 
 class UnderscoreTest(TestCase):
@@ -111,5 +111,7 @@ class UnderscoreTest(TestCase):
 
     def test_1to9_placeholder(self):
         eq_((_1 + _2 * _2)(10, 100), 10010)
+
+    @raises(SyntaxError)
+    def test_1to9_placeholder_and_unnamed_placeholder(self):
         eq_((_1 + _2 * _2 + _)(10, 100, 10), 10020)
-        eq_((_1 + _2 * _2 + _ * _)(10, 100, 10, 20), 10210)

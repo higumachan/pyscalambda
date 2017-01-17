@@ -21,7 +21,15 @@ class Formula(object):
     def create_lambda_string(self):
         traversed = list(self.traverse())
         body = "".join(traversed)
-        args = ",".join(list(sorted(set(self.traverse_constize_args()))) + list(self.traverse_args()))
+
+        constized_args = sorted(list(set(self.traverse_constize_args())))
+        unnamed_args = list(self.traverse_args())
+        if len(constized_args) == 0:
+            args = ",".join(unnamed_args)
+        elif len(unnamed_args) == 0:
+            args = ",".join(constized_args)
+        else:
+            raise SyntaxError("_ and _1 ~ _9 can not be used at the same time.")
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
@@ -60,7 +68,8 @@ class Formula(object):
 
     def do_methodcall(self, method):
         def f(*args, **kwargs):
-            return MethodCall(self, method,
+            this = Formula.convert_oprand(self)
+            return MethodCall(this, method,
                     map(Formula.convert_oprand, args),
                     vmap(Formula.convert_oprand, kwargs))
         return f
@@ -392,7 +401,8 @@ if __name__ == '__main__':
     print (~_)(-1)
     print (-_)(3)
     print (_.test("test", k, "cute"))(ct())
-    print (_.test(_ + _, _, _ * 2))(ct(), "test", "+nadeko", "____", "lambda")
+    #print (_.test(_ + _, _, _ * 2))(ct(), "test", "+nadeko", "____", "lambda")
+    print (_.test(_ + _, _, _ * 2)).debug()
     def test(x):
         return 100 + x
     print (scalambdable_func(test)(10) + _)(1000)
@@ -407,3 +417,5 @@ if __name__ == '__main__':
     (_ + 10 * _).debug()
     (_ * 10 + _).debug()
     print(_1 + _2 * _2)(10, 100)
+    print _(10)
+    print _.debug()
