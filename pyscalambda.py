@@ -6,6 +6,7 @@ def vmap(f, dic):
 
 class Formula(object):
     def __init__(self):
+        self.is_cache = True
         self.cache_lambda = None
         self.cache_consts = None
         self.children = []
@@ -17,6 +18,10 @@ class Formula(object):
         print self.create_lambda_string()
         print list(self.traverse_const_values())
 
+
+    def nocache(self):
+        self.is_cache = False
+        return self
 
     def create_lambda_string(self):
         traversed = list(self.traverse())
@@ -32,8 +37,8 @@ class Formula(object):
             raise SyntaxError("_ and _1 ~ _9 can not be used at the same time.")
         return "lambda {}:{}".format(args, body)
 
-    def __call__(self, *args):
-        if self.cache_lambda is None:
+    def __call__(self, *args) :
+        if not self.is_cache or self.cache_lambda is None:
             binds = self.traverse_const_values()
             lambda_string = self.create_lambda_string()
             self.cache_lambda = eval(lambda_string, dict(binds))
@@ -375,7 +380,9 @@ class Underscore(Formula):
 def scalambdable_func(f):
     @functools.wraps(f)
     def wraps(*args, **kwargs):
-        return FunctionCall(f, map(Formula.convert_oprand, args), vmap(Formula.convert_oprand, kwargs))
+        if any(map(lambda x: issubclass(x.__class__, Formula), args)) or any(map(lambda x: issubclass(x.__class__, Formula), kwargs.values())):
+            return FunctionCall(f, map(Formula.convert_oprand, args), vmap(Formula.convert_oprand, kwargs))
+        return f(*args, **kwargs)
     return wraps
 
 _ = Underscore(0)
@@ -419,3 +426,5 @@ if __name__ == '__main__':
     print(_1 + _2 * _2)(10, 100)
     print _(10)
     print _.debug()
+    print SF(test)(10)
+    print SF(test)(_)(10)
