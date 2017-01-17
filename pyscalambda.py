@@ -21,13 +21,12 @@ class Formula(object):
     def create_lambda_string(self):
         traversed = list(self.traverse())
         body = "".join(traversed)
-        args = ",".join(self.traverse_args())
+        args = ",".join(list(sorted(set(self.traverse_constize_args()))) + list(self.traverse_args()))
         return "lambda {}:{}".format(args, body)
 
     def __call__(self, *args):
         if self.cache_lambda is None:
             binds = self.traverse_const_values()
-            #self.cache_consts = dict(binds)
             lambda_string = self.create_lambda_string()
             self.cache_lambda = eval(lambda_string, dict(binds))
         return self.cache_lambda(*args)
@@ -36,7 +35,7 @@ class Formula(object):
     def convert_oprand(cls, x):
         if not issubclass(x.__class__, Formula):
             return Operand(x)
-        if isinstance(x, Underscore):
+        if isinstance(x, Underscore) and x.id == 0:
             return Underscore()
         return x
 
@@ -201,6 +200,11 @@ class Formula(object):
             for t in child.traverse_args():
                 yield t
 
+    def traverse_constize_args(self):
+        for child in self.children:
+            for t in child.traverse_constize_args():
+                yield t
+
 
 class Operator1(Formula):
     def __init__(self, operator, value):
@@ -334,12 +338,16 @@ class FunctionCall(Formula):
 
 
 class Underscore(Formula):
-    COUNTER = 0
+    NUMBER_CONSTIZE = 10
+    COUNTER = NUMBER_CONSTIZE
 
-    def __init__(self):
+    def __init__(self, id=None):
         super(Underscore, self).__init__()
-        self.id = Underscore.COUNTER
-        Underscore.COUNTER += 1
+        if id is None:
+            self.id = Underscore.COUNTER
+            Underscore.COUNTER += 1
+        else:
+            self.id = id
 
     def traverse(self):
         yield '('
@@ -347,7 +355,12 @@ class Underscore(Formula):
         yield ')'
 
     def traverse_args(self):
-        yield "___ARG{}___".format(self.id)
+        if self.id >= Underscore.NUMBER_CONSTIZE:
+            yield "___ARG{}___".format(self.id)
+
+    def traverse_constize_args(self):
+        if self.id < Underscore.NUMBER_CONSTIZE:
+            yield "___ARG{}___".format(self.id)
 
 
 def scalambdable_func(f):
@@ -356,7 +369,16 @@ def scalambdable_func(f):
         return FunctionCall(f, map(Formula.convert_oprand, args), vmap(Formula.convert_oprand, kwargs))
     return wraps
 
-_ = Underscore()
+_ = Underscore(0)
+_1 = Underscore(1)
+_2 = Underscore(2)
+_3 = Underscore(3)
+_4 = Underscore(4)
+_5 = Underscore(5)
+_6 = Underscore(6)
+_7 = Underscore(7)
+_8 = Underscore(8)
+_9 = Underscore(9)
 SF = scalambdable_func
 
 if __name__ == '__main__':
@@ -364,7 +386,7 @@ if __name__ == '__main__':
         def test(self, a, b, c):
             return a + b + c + "___test"
     k = "nadeko"
-    print (_ + _)(1, 2)
+    print (_ + _).debug()
     print (_ + _ * _)(1, 2, 3)
     print (+_)(3)
     print (~_)(-1)
@@ -380,3 +402,8 @@ if __name__ == '__main__':
     print (1 + 2 + _ + 3)(10)
     print (1 + 2 + _ + 3 + _)(10, 12)
     print globals() 
+    (10 + -_ * 2).debug()
+    (10 + _ * _).debug()
+    (_ + 10 * _).debug()
+    (_ * 10 + _).debug()
+    print(_1 + _2 * _2)(10, 100)
