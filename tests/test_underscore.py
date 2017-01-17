@@ -1,6 +1,6 @@
 from unittest import TestCase
 from nose.tools import eq_, ok_
-from pyscalambda import _, SF
+from pyscalambda import _, SF, _1, _2
 
 class UnderscoreTest(TestCase):
     def test_identity(self):
@@ -32,6 +32,8 @@ class UnderscoreTest(TestCase):
     def test_calc_complex_formula(self):
         eq_((3 + _ * 4 + _)(1, 2), 9)
         eq_((3 + _ * 4 + (_ + 1) * 100)(1, 2), 307)
+        eq_((10 + -_ * 2)(1), 8)
+        eq_(((10 + -_) * 2)(1), 18)
 
     def test_call_method(self):
         eq_((_.split(","))("test,nadeko"), ["test", "nadeko"])
@@ -106,3 +108,8 @@ class UnderscoreTest(TestCase):
                 self.bc = 10
         a = A()
         assert (_.a(a) == 100) == True
+
+    def test_1to9_placeholder(self):
+        eq_((_1 + _2 * _2)(10, 100), 10010)
+        eq_((_1 + _2 * _2 + _)(10, 100, 10), 10020)
+        eq_((_1 + _2 * _2 + _ * _)(10, 100, 10, 20), 10210)
