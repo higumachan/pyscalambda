@@ -47,7 +47,7 @@ class Formula(object):
     @classmethod
     def convert_oprand(cls, x):
         if not issubclass(x.__class__, Formula):
-            return Operand(x)
+            return ConstOperand(x)
         if isinstance(x, Underscore) and x.id == 0:
             return Underscore()
         return x
@@ -220,7 +220,11 @@ class Formula(object):
                 yield t
 
 
-class Operator1(Formula):
+class Operator(Formula):
+    pass
+
+
+class Operator1(Operator):
     def __init__(self, operator, value):
         super(Operator1, self).__init__()
         self.operator = operator
@@ -235,8 +239,7 @@ class Operator1(Formula):
         yield ')'
 
 
-
-class Operator2(Formula):
+class Operator2(Operator):
     def __init__(self, operator, left, right):
         super(Operator2, self).__init__()
         self.operator = operator
@@ -253,13 +256,18 @@ class Operator2(Formula):
             yield t
         yield ')'
 
+
 class Operand(Formula):
+    pass
+
+
+class ConstOperand(Operand):
     COUNTER = 0
 
     def __init__(self, value):
-        super(Operand, self).__init__()
-        self.id = Operand.COUNTER
-        Operand.COUNTER += 1
+        super(ConstOperand, self).__init__()
+        self.id = ConstOperand.COUNTER
+        ConstOperand.COUNTER += 1
         self.value = value
 
     def traverse(self):
@@ -269,6 +277,33 @@ class Operand(Formula):
 
     def traverse_const_values(self):
         yield ('CONST_{}'.format(self.id), self.value)
+
+
+class Underscore(Operand):
+    NUMBER_CONSTIZE = 10
+    COUNTER = NUMBER_CONSTIZE
+
+    def __init__(self, id=None):
+        super(Underscore, self).__init__()
+        if id is None:
+            self.id = Underscore.COUNTER
+            Underscore.COUNTER += 1
+        else:
+            self.id = id
+
+    def traverse(self):
+        yield '('
+        yield "___ARG{}___".format(self.id)
+        yield ')'
+
+    def traverse_args(self):
+        if self.id >= Underscore.NUMBER_CONSTIZE:
+            yield "___ARG{}___".format(self.id)
+
+    def traverse_constize_args(self):
+        if self.id < Underscore.NUMBER_CONSTIZE:
+            yield "___ARG{}___".format(self.id)
+
 
 
 class MethodCall(Formula):
@@ -350,31 +385,6 @@ class FunctionCall(Formula):
         for t in super(FunctionCall, self).traverse_const_values():
             yield t
 
-
-class Underscore(Formula):
-    NUMBER_CONSTIZE = 10
-    COUNTER = NUMBER_CONSTIZE
-
-    def __init__(self, id=None):
-        super(Underscore, self).__init__()
-        if id is None:
-            self.id = Underscore.COUNTER
-            Underscore.COUNTER += 1
-        else:
-            self.id = id
-
-    def traverse(self):
-        yield '('
-        yield "___ARG{}___".format(self.id)
-        yield ')'
-
-    def traverse_args(self):
-        if self.id >= Underscore.NUMBER_CONSTIZE:
-            yield "___ARG{}___".format(self.id)
-
-    def traverse_constize_args(self):
-        if self.id < Underscore.NUMBER_CONSTIZE:
-            yield "___ARG{}___".format(self.id)
 
 
 def scalambdable_func(f):
