@@ -1,7 +1,7 @@
 #PyScaLambda
 
 ## Description
-Scala's
+Scalaの
 ```scala
 (_ + _)(1, 2)
 ```
