@@ -322,7 +322,6 @@ class MethodCall(Formula):
         yield '.'
         yield self.method
         yield '('
-        print self.args
         for arg in self.args:
             for t in arg.traverse():
                 yield t
