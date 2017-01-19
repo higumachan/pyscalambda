@@ -4,6 +4,7 @@ import functools
 def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
 
+
 class Formula(object):
     @property
     def __name__(self):
@@ -49,7 +50,7 @@ class Formula(object):
             self.cache_lambda = self.create_lambda()
         return self.cache_lambda
 
-    def __call__(self, *args) :
+    def __call__(self, *args):
         return self.get_lambda()(*args)
 
     @classmethod
@@ -82,12 +83,14 @@ class Formula(object):
     def do_methodcall(self, method):
         def f(*args, **kwargs):
             this = Formula.convert_oprand(self)
-            return MethodCall(this, method,
-                    list(map(Formula.convert_oprand, args)),
-                    vmap(Formula.convert_oprand, kwargs))
+            return MethodCall(
+                this,
+                method,
+                list(map(Formula.convert_oprand, args)),
+                vmap(Formula.convert_oprand, kwargs)
+            )
         return f
 
-#%{{{
     def __add__(self, other):
         return self.do_operator2(other, "+")
 
@@ -201,7 +204,6 @@ class Formula(object):
 
     def __rxor__(self, other):
         return self.rdo_operator2(other, "^")
-#%}}}
 
     def __pos__(self):
         return self.do_operator1("+")
@@ -319,9 +321,8 @@ class Underscore(Operand):
             yield "___ARG{}___".format(self.id)
 
 
-
 class MethodCall(Formula):
-    def __init__(self, value,  method, args, kwargs):
+    def __init__(self, value, method, args, kwargs):
         super(MethodCall, self).__init__()
         self.value = value
         self.method = method
@@ -372,7 +373,7 @@ class FunctionCall(Formula):
 
     def __init__(self, func, args, kwargs):
         super(FunctionCall, self).__init__()
-        self.id = FunctionCall.COUNTER 
+        self.id = FunctionCall.COUNTER
         FunctionCall.COUNTER += 1
         self.func = func
         self.args = args
@@ -399,12 +400,13 @@ class FunctionCall(Formula):
             yield t
 
 
-
 def scalambdable_func(*funcs):
     @functools.wraps(funcs[0])
     def wraps(*args, **kwargs):
         for f in reversed(funcs):
-            if any(map(lambda x: issubclass(x.__class__, Formula), args)) or any(map(lambda x: issubclass(x.__class__, Formula), kwargs.values())):
+            def is_scalambda_object(x):
+                return issubclass(x.__class__, Formula)
+            if any(map(is_scalambda_object, args)) or any(map(is_scalambda_object, kwargs.values())):
                 args = [FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))]
                 kwargs = {}
             else:
@@ -412,6 +414,7 @@ def scalambdable_func(*funcs):
                 kwargs = {}
         return args[0]
     return wraps
+
 
 _ = Underscore(0)
 _1 = Underscore(1)
@@ -424,4 +427,3 @@ _7 = Underscore(7)
 _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
-
