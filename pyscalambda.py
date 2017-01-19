@@ -10,7 +10,7 @@ def can_str_emmbed(value):
 
 
 def str_emmbed(value):
-    return "'{}'".format(value) if isinstance(value, str) else str(value) 
+    return "'{}'".format(value) if isinstance(value, str) else str(value)
 
 
 class Formula(object):
