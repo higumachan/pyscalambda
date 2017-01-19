@@ -429,8 +429,3 @@ _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
 
-if __name__ == '__main__':
-    print(getattr((_ + 1), "__name__"))
-    print((SF(_ + 1, len)(_)).debug())
-    print((SF(_ + 6, len)(_))([1, 2, 3]))
-    print((SF(_ + 4, len)(_))([1, 2, 3]))
