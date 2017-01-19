@@ -6,10 +6,11 @@ def vmap(f, dic):
 
 
 def can_str_emmbed(value):
-    try:
-        return eval(str(value)) == value
-    except:
-        return False
+    return isinstance(value, (int, str, float))
+
+
+def str_emmbed(value):
+    return "'{}'".format(value) if isinstance(value, str) else str(value) 
 
 
 class Formula(object):
@@ -297,7 +298,7 @@ class ConstOperand(Operand):
 
     def traverse(self):
         yield '('
-        yield "CONST_{}".format(self.id) if self.is_use_dict else str(self.value)
+        yield "CONST_{}".format(self.id) if self.is_use_dict else str_emmbed(self.value)
         yield ')'
 
     def traverse_const_values(self):
