@@ -82,6 +82,17 @@ class UnderscoreTest(TestCase):
         eq_(list(map(SF(test), list(map((SF(len)(_) + 1), [list(range(1)), list(range(2)), list(range(3))])))), [102, 103, 104])
         eq_(SF(test)(10), 110)
 
+    def test_scalambdable_func_multi_args(self):
+        eq_(SF(_ + 1, len)(_)([1, 2, 3]), 4)
+        eq_(SF(lambda x: x + 1, len)(_)([1, 2, 3]), 4)
+        def test(x):
+            return x + 1
+        eq_(SF(test, len)(_)([1, 2, 3]), 4)
+        @SF
+        def test2(x):
+            return x + 1
+        eq_(test2(SF(len)(_))([1, 2, 3]), 4)
+
     def test_readme(self):
         eq_(list(map(_ + 1, [1, 2, 3, 4])), [2, 3, 4, 5])
         eq_("".join(filter(_.isdigit(), "ab123aad")), "123")
