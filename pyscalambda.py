@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import functools
 
 
@@ -15,8 +17,8 @@ class Formula(object):
         return self.create_lambda_string()
 
     def debug(self):
-        print self.create_lambda_string()
-        print list(self.traverse_const_values())
+        print(self.create_lambda_string())
+        print(list(self.traverse_const_values()))
 
 
     def nocache(self):
@@ -75,7 +77,7 @@ class Formula(object):
         def f(*args, **kwargs):
             this = Formula.convert_oprand(self)
             return MethodCall(this, method,
-                    map(Formula.convert_oprand, args),
+                    list(map(Formula.convert_oprand, args)),
                     vmap(Formula.convert_oprand, kwargs))
         return f
 
@@ -90,6 +92,9 @@ class Formula(object):
         return self.do_operator2(other, "*")
 
     def __div__(self, other):
+        return self.do_operator2(other, "/")
+
+    def __truediv__(self, other):
         return self.do_operator2(other, "/")
 
     def __floordiv__(self, other):
@@ -144,6 +149,9 @@ class Formula(object):
         return self.rdo_operator2(other, "*")
 
     def __rdiv__(self, other):
+        return self.rdo_operator2(other, "/")
+
+    def __rtruediv__(self, other):
         return self.rdo_operator2(other, "/")
 
     def __rfloordiv__(self, other):
@@ -313,7 +321,7 @@ class MethodCall(Formula):
         self.method = method
         self.args = args
         self.kwargs = kwargs
-        self.children = [self.value] + self.args + self.kwargs.values()
+        self.children = [self.value] + self.args + list(self.kwargs.values())
 
     def traverse(self):
         yield '('
@@ -363,7 +371,7 @@ class FunctionCall(Formula):
         self.func = func
         self.args = args
         self.kwargs = kwargs
-        self.children = self.args + self.kwargs.values()
+        self.children = self.args + list(self.kwargs.values())
 
     def traverse(self):
         yield "BIND_FUNC_{}".format(self.id)
@@ -390,7 +398,7 @@ def scalambdable_func(f):
     @functools.wraps(f)
     def wraps(*args, **kwargs):
         if any(map(lambda x: issubclass(x.__class__, Formula), args)) or any(map(lambda x: issubclass(x.__class__, Formula), kwargs.values())):
-            return FunctionCall(f, map(Formula.convert_oprand, args), vmap(Formula.convert_oprand, kwargs))
+            return FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))
         return f(*args, **kwargs)
     return wraps
 
@@ -406,34 +414,3 @@ _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
 
-if __name__ == '__main__':
-    class ct:
-        def test(self, a, b, c):
-            return a + b + c + "___test"
-    k = "nadeko"
-    print (_ + _).debug()
-    print (_ + _ * _)(1, 2, 3)
-    print (+_)(3)
-    print (~_)(-1)
-    print (-_)(3)
-    print (_.test("test", k, "cute"))(ct())
-    #print (_.test(_ + _, _, _ * 2))(ct(), "test", "+nadeko", "____", "lambda")
-    print (_.test(_ + _, _, _ * 2)).debug()
-    def test(x):
-        return 100 + x
-    print (scalambdable_func(test)(10) + _)(1000)
-    l = _ + 1
-    print map(l, [1, 2, 3, 4])
-    print (_[1])([1, 2, 3])
-    print (1 + 2 + _ + 3)(10)
-    print (1 + 2 + _ + 3 + _)(10, 12)
-    print globals() 
-    (10 + -_ * 2).debug()
-    (10 + _ * _).debug()
-    (_ + 10 * _).debug()
-    (_ * 10 + _).debug()
-    print(_1 + _2 * _2)(10, 100)
-    print _(10)
-    print _.debug()
-    print SF(test)(10)
-    print SF(test)(_)(10)
