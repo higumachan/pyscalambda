@@ -217,9 +217,6 @@ class Formula(object):
         return self.do_operator1("~")
 
     def __getattr__(self, method):
-        if method == "__name__":
-            print(self.get_lambda())
-            return self.get_lambda().__name__
         return self.do_methodcall(method)
 
     def __getitem__(self, key):
@@ -432,3 +429,8 @@ _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
 
+if __name__ == '__main__':
+    print(getattr((_ + 1), "__name__"))
+    print((SF(_ + 1, len)(_)).debug())
+    print((SF(_ + 6, len)(_))([1, 2, 3]))
+    print((SF(_ + 4, len)(_))([1, 2, 3]))
