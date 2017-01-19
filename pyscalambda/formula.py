@@ -1,16 +1,5 @@
-import functools
 
-
-def vmap(f, dic):
-    return dict(zip(dic.keys(), map(f, dic.values())))
-
-
-def can_str_emmbed(value):
-    return isinstance(value, (int, str, float))
-
-
-def str_emmbed(value):
-    return "'{}'".format(value) if isinstance(value, str) else str(value)
+from utility import vmap
 
 
 class Formula(object):
@@ -63,6 +52,8 @@ class Formula(object):
 
     @classmethod
     def convert_oprand(cls, x):
+        from operands import ConstOperand, Underscore
+
         if not issubclass(x.__class__, Formula):
             return ConstOperand(x)
         if isinstance(x, Underscore) and x.id == 0:
@@ -70,25 +61,35 @@ class Formula(object):
         return x
 
     def do_operator2(self, other, operator):
+        from operators import BinaryOperator
+
         this = Formula.convert_oprand(self)
         other = Formula.convert_oprand(other)
-        return Operator2(operator, this, other)
+        return BinaryOperator(operator, this, other)
 
     def rdo_operator2(self, other, operator):
+        from operators import BinaryOperator
+
         this = Formula.convert_oprand(self)
         other = Formula.convert_oprand(other)
-        return Operator2(operator, other, this)
+        return BinaryOperator(operator, other, this)
 
     def do_operator1(self, operator):
+        from operators import UnaryOperator
+
         this = Formula.convert_oprand(self)
-        return Operator1(operator, this)
+        return UnaryOperator(operator, this)
 
     def do_getitem(self, item):
+        from formula_nodes import GetItem
+
         this = Formula.convert_oprand(self)
         item = Formula.convert_oprand(item)
         return GetItem(this, item)
 
     def do_methodcall(self, method):
+        from formula_nodes import MethodCall
+
         def f(*args, **kwargs):
             this = Formula.convert_oprand(self)
             return MethodCall(
@@ -242,199 +243,3 @@ class Formula(object):
         for child in self.children:
             for t in child.traverse_constize_args():
                 yield t
-
-
-class Operator(Formula):
-    pass
-
-
-class Operator1(Operator):
-    def __init__(self, operator, value):
-        super(Operator1, self).__init__()
-        self.operator = operator
-        self.value = value
-        self.children = [self.value]
-
-    def traverse(self):
-        yield '('
-        yield self.operator
-        for t in self.value.traverse():
-            yield t
-        yield ')'
-
-
-class Operator2(Operator):
-    def __init__(self, operator, left, right):
-        super(Operator2, self).__init__()
-        self.operator = operator
-        self.left = left
-        self.right = right
-        self.children = [self.left, self.right]
-
-    def traverse(self):
-        yield '('
-        for t in self.left.traverse():
-            yield t
-        yield self.operator
-        for t in self.right.traverse():
-            yield t
-        yield ')'
-
-
-class Operand(Formula):
-    pass
-
-
-class ConstOperand(Operand):
-    COUNTER = 0
-
-    def __init__(self, value):
-        super(ConstOperand, self).__init__()
-        self.id = ConstOperand.COUNTER
-        ConstOperand.COUNTER += 1
-        self.value = value
-
-        self.is_use_dict = not can_str_emmbed(self.value)
-
-    def traverse(self):
-        yield '('
-        yield "CONST_{}".format(self.id) if self.is_use_dict else str_emmbed(self.value)
-        yield ')'
-
-    def traverse_const_values(self):
-        if self.is_use_dict:
-            yield ('CONST_{}'.format(self.id), self.value)
-
-
-class Underscore(Operand):
-    NUMBER_CONSTIZE = 10
-    COUNTER = NUMBER_CONSTIZE
-
-    def __init__(self, id=None):
-        super(Underscore, self).__init__()
-        if id is None:
-            self.id = Underscore.COUNTER
-            Underscore.COUNTER += 1
-        else:
-            self.id = id
-
-    def traverse(self):
-        yield '('
-        yield "___ARG{}___".format(self.id)
-        yield ')'
-
-    def traverse_args(self):
-        if self.id >= Underscore.NUMBER_CONSTIZE:
-            yield "___ARG{}___".format(self.id)
-
-    def traverse_constize_args(self):
-        if self.id < Underscore.NUMBER_CONSTIZE:
-            yield "___ARG{}___".format(self.id)
-
-
-class MethodCall(Formula):
-    def __init__(self, value, method, args, kwargs):
-        super(MethodCall, self).__init__()
-        self.value = value
-        self.method = method
-        self.args = args
-        self.kwargs = kwargs
-        self.children = [self.value] + self.args + list(self.kwargs.values())
-
-    def traverse(self):
-        yield '('
-        for t in self.value.traverse():
-            yield t
-        yield '.'
-        yield self.method
-        yield '('
-        for arg in self.args:
-            for t in arg.traverse():
-                yield t
-            yield ','
-        for name, arg in self.kwargs:
-            yield '{}='.format(name)
-            for t in self.arg.traverse():
-                yield t
-            yield ','
-        yield ')'
-        yield ')'
-
-
-class GetItem(Formula):
-    def __init__(self, value, item):
-        super(GetItem, self).__init__()
-        self.value = value
-        self.item = item
-        self.children = [self.value, self.item]
-
-    def traverse(self):
-        yield '('
-        for t in self.value.traverse():
-            yield t
-        yield '['
-        for t in self.item.traverse():
-            yield t
-        yield ']'
-        yield ')'
-
-
-class FunctionCall(Formula):
-    COUNTER = 0
-
-    def __init__(self, func, args, kwargs):
-        super(FunctionCall, self).__init__()
-        self.id = FunctionCall.COUNTER
-        FunctionCall.COUNTER += 1
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-        self.children = self.args + list(self.kwargs.values())
-
-    def traverse(self):
-        yield "BIND_FUNC_{}".format(self.id)
-        yield '('
-        for arg in self.args:
-            for t in arg.traverse():
-                yield t
-            yield ','
-        for name, arg in self.kwargs:
-            yield '{}='.format(name)
-            for t in arg.traverse():
-                yield t
-            yield ','
-        yield ')'
-
-    def traverse_const_values(self):
-        yield ('BIND_FUNC_{}'.format(self.id), self.func)
-        for t in super(FunctionCall, self).traverse_const_values():
-            yield t
-
-
-def scalambdable_func(*funcs):
-    @functools.wraps(funcs[0])
-    def wraps(*args, **kwargs):
-        for f in reversed(funcs):
-            def is_scalambda_object(x):
-                return issubclass(x.__class__, Formula)
-            if any(map(is_scalambda_object, args)) or any(map(is_scalambda_object, kwargs.values())):
-                args = [FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))]
-                kwargs = {}
-            else:
-                args = [f(*args, **kwargs)]
-                kwargs = {}
-        return args[0]
-    return wraps
-
-
-_ = Underscore(0)
-_1 = Underscore(1)
-_2 = Underscore(2)
-_3 = Underscore(3)
-_4 = Underscore(4)
-_5 = Underscore(5)
-_6 = Underscore(6)
-_7 = Underscore(7)
-_8 = Underscore(8)
-_9 = Underscore(9)
-SF = scalambdable_func
