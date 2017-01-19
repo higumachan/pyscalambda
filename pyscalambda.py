@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import functools
 
 
@@ -17,9 +15,7 @@ class Formula(object):
         return self.create_lambda_string()
 
     def debug(self):
-        print(self.create_lambda_string())
-        print(list(self.traverse_const_values()))
-
+        return (self.create_lambda_string(), list(self.traverse_const_values()))
 
     def nocache(self):
         self.is_cache = False
