@@ -7,6 +7,10 @@ def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
 
 class Formula(object):
+    @property
+    def __name__(self):
+        return self.get_lambda().__name__
+
     def __init__(self):
         self.is_cache = True
         self.cache_lambda = None
@@ -39,12 +43,18 @@ class Formula(object):
             raise SyntaxError("_ and _1 ~ _9 can not be used at the same time.")
         return "lambda {}:{}".format(args, body)
 
-    def __call__(self, *args) :
+    def create_lambda(self):
+        binds = self.traverse_const_values()
+        lambda_string = self.create_lambda_string()
+        return eval(lambda_string, dict(binds))
+
+    def get_lambda(self):
         if not self.is_cache or self.cache_lambda is None:
-            binds = self.traverse_const_values()
-            lambda_string = self.create_lambda_string()
-            self.cache_lambda = eval(lambda_string, dict(binds))
-        return self.cache_lambda(*args)
+            self.cache_lambda = self.create_lambda()
+        return self.cache_lambda
+
+    def __call__(self, *args) :
+        return self.get_lambda()(*args)
 
     @classmethod
     def convert_oprand(cls, x):
@@ -207,6 +217,9 @@ class Formula(object):
         return self.do_operator1("~")
 
     def __getattr__(self, method):
+        if method == "__name__":
+            print(self.get_lambda())
+            return self.get_lambda().__name__
         return self.do_methodcall(method)
 
     def __getitem__(self, key):
@@ -394,12 +407,17 @@ class FunctionCall(Formula):
 
 
 
-def scalambdable_func(f):
-    @functools.wraps(f)
+def scalambdable_func(*funcs):
+    @functools.wraps(funcs[0])
     def wraps(*args, **kwargs):
-        if any(map(lambda x: issubclass(x.__class__, Formula), args)) or any(map(lambda x: issubclass(x.__class__, Formula), kwargs.values())):
-            return FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))
-        return f(*args, **kwargs)
+        for f in reversed(funcs):
+            if any(map(lambda x: issubclass(x.__class__, Formula), args)) or any(map(lambda x: issubclass(x.__class__, Formula), kwargs.values())):
+                args = [FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))]
+                kwargs = {}
+            else:
+                args = [f(*args, **kwargs)]
+                kwargs = {}
+        return args[0]
     return wraps
 
 _ = Underscore(0)
