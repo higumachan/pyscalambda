@@ -8,3 +8,14 @@ def can_str_emmbed(value):
 
 def str_emmbed(value):
     return "'{}'".format(value) if isinstance(value, str) else str(value)
+
+
+def convert_oprand(x):
+    from operands import ConstOperand, Underscore
+    from formula import Formula
+
+    if not issubclass(x.__class__, Formula):
+        return ConstOperand(x)
+    if isinstance(x, Underscore) and x.id == 0:
+        return Underscore()
+    return x
