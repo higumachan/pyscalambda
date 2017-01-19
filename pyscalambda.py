@@ -296,14 +296,9 @@ class ConstOperand(Operand):
         self.is_use_dict = not can_str_emmbed(self.value)
 
     def traverse(self):
-        if self.is_use_dict:
-            yield '('
-            yield "CONST_{}".format(self.id)
-            yield ')'
-        else:
-            yield '('
-            yield str(self.value)
-            yield ')'
+        yield '('
+        yield "CONST_{}".format(self.id) if self.is_use_dict else str(self.value)
+        yield ')'
 
     def traverse_const_values(self):
         if self.is_use_dict:
