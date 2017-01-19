@@ -136,3 +136,11 @@ class UnderscoreTest(TestCase):
     @raises(SyntaxError)
     def test_1to9_placeholder_and_unnamed_placeholder(self):
         eq_((_1 + _2 * _2 + _)(10, 100, 10), 10020)
+
+    def test_not_use_const_dict(self):
+        eq_(len((_ + 1 + 1 + 1).debug()[1]), 0)
+
+        class A(object):
+            pass
+
+        eq_(len((_ + A()).debug()[1]), 1)

@@ -5,6 +5,14 @@ def vmap(f, dic):
     return dict(zip(dic.keys(), map(f, dic.values())))
 
 
+def can_str_emmbed(value):
+    return isinstance(value, (int, str, float))
+
+
+def str_emmbed(value):
+    return "'{}'".format(value) if isinstance(value, str) else str(value)
+
+
 class Formula(object):
     @property
     def __name__(self):
@@ -286,13 +294,16 @@ class ConstOperand(Operand):
         ConstOperand.COUNTER += 1
         self.value = value
 
+        self.is_use_dict = not can_str_emmbed(self.value)
+
     def traverse(self):
         yield '('
-        yield "CONST_{}".format(self.id)
+        yield "CONST_{}".format(self.id) if self.is_use_dict else str_emmbed(self.value)
         yield ')'
 
     def traverse_const_values(self):
-        yield ('CONST_{}'.format(self.id), self.value)
+        if self.is_use_dict:
+            yield ('CONST_{}'.format(self.id), self.value)
 
 
 class Underscore(Operand):
