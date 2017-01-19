@@ -1,5 +1,8 @@
 #PyScaLambda
 
+## Status
+[![CircleCI](https://circleci.com/gh/higumachan/pyscalambda.svg?style=svg)](https://circleci.com/gh/higumachan/pyscalambda)
+
 ## Description
 Scalaの
 ```scala
