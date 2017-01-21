@@ -62,7 +62,7 @@ class Formula(object):
         return self.get_lambda()(*args)
 
     @classmethod
-    def convert_oprand(cls, x):
+    def convert_operand(cls, x):
         if not issubclass(x.__class__, Formula):
             return ConstOperand(x)
         if isinstance(x, Underscore) and x.id == 0:
@@ -70,32 +70,32 @@ class Formula(object):
         return x
 
     def do_operator2(self, other, operator):
-        this = Formula.convert_oprand(self)
-        other = Formula.convert_oprand(other)
+        this = Formula.convert_operand(self)
+        other = Formula.convert_operand(other)
         return Operator2(operator, this, other)
 
     def rdo_operator2(self, other, operator):
-        this = Formula.convert_oprand(self)
-        other = Formula.convert_oprand(other)
+        this = Formula.convert_operand(self)
+        other = Formula.convert_operand(other)
         return Operator2(operator, other, this)
 
     def do_operator1(self, operator):
-        this = Formula.convert_oprand(self)
+        this = Formula.convert_operand(self)
         return Operator1(operator, this)
 
     def do_getitem(self, item):
-        this = Formula.convert_oprand(self)
-        item = Formula.convert_oprand(item)
+        this = Formula.convert_operand(self)
+        item = Formula.convert_operand(item)
         return GetItem(this, item)
 
     def do_methodcall(self, method):
         def f(*args, **kwargs):
-            this = Formula.convert_oprand(self)
+            this = Formula.convert_operand(self)
             return MethodCall(
                 this,
                 method,
-                list(map(Formula.convert_oprand, args)),
-                vmap(Formula.convert_oprand, kwargs)
+                list(map(Formula.convert_operand, args)),
+                vmap(Formula.convert_operand, kwargs)
             )
         return f
 
@@ -418,7 +418,7 @@ def scalambdable_func(*funcs):
             def is_scalambda_object(x):
                 return issubclass(x.__class__, Formula)
             if any(map(is_scalambda_object, args)) or any(map(is_scalambda_object, kwargs.values())):
-                args = [FunctionCall(f, list(map(Formula.convert_oprand, args)), vmap(Formula.convert_oprand, kwargs))]
+                args = [FunctionCall(f, list(map(Formula.convert_operand, args)), vmap(Formula.convert_operand, kwargs))]
                 kwargs = {}
             else:
                 args = [f(*args, **kwargs)]
