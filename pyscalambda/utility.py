@@ -11,8 +11,8 @@ def str_emmbed(value):
 
 
 def convert_oprand(x):
-    from operands import ConstOperand, Underscore
-    from formula import Formula
+    from pyscalambda.operands import ConstOperand, Underscore
+    from pyscalambda.formula import Formula
 
     if not issubclass(x.__class__, Formula):
         return ConstOperand(x)
