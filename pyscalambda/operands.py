@@ -1,6 +1,6 @@
-from formula import Formula
+from pyscalambda.formula import Formula
 
-from utility import can_str_emmbed, str_emmbed
+from pyscalambda.utility import can_str_emmbed, str_emmbed
 
 
 class Operand(Formula):

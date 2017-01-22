@@ -1,10 +1,10 @@
 import functools
 
-from formula import Formula
+from pyscalambda.formula import Formula
 
-from formula_nodes import FunctionCall
+from pyscalambda.formula_nodes import FunctionCall
 
-from utility import convert_oprand, vmap
+from pyscalambda.utility import convert_oprand, vmap
 
 
 def scalambdable_func(*funcs):

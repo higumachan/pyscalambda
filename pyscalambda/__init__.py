@@ -1,6 +1,6 @@
-from operands import Underscore
+from pyscalambda.operands import Underscore
 
-from scalambdable import scalambdable_func
+from pyscalambda.scalambdable import scalambdable_func
 
 _ = Underscore(0)
 _1 = Underscore(1)
