@@ -9,6 +9,8 @@ from pyscalambda.utility import convert_oprand, vmap
 
 def scalambdable_func(fn, *funcs):
     """
+    Wrap function to scalambdable.
+
     :type fn: (T)->U
     :type funcs: ((Any)->Any, ...)
     :rtype: (T)->U
