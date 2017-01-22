@@ -21,9 +21,9 @@ class MethodCall(Formula):
             for t in arg.traverse():
                 yield t
             yield ','
-        for name, arg in self.kwargs:
+        for name, arg in self.kwargs.items():
             yield '{}='.format(name)
-            for t in self.arg.traverse():
+            for t in arg.traverse():
                 yield t
             yield ','
         yield ')'
@@ -67,7 +67,7 @@ class FunctionCall(Formula):
             for t in arg.traverse():
                 yield t
             yield ','
-        for name, arg in self.kwargs:
+        for name, arg in self.kwargs.items():
             yield '{}='.format(name)
             for t in arg.traverse():
                 yield t
