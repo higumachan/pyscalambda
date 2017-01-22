@@ -1,4 +1,4 @@
-from formula import Formula
+from pyscalambda.formula import Formula
 
 
 class Operator(Formula):

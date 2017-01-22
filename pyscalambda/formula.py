@@ -1,4 +1,4 @@
-from base_formula import BaseFormula
+from pyscalambda.base_formula import BaseFormula
 
 
 class Formula(BaseFormula):

@@ -1,4 +1,4 @@
-from utility import convert_oprand, vmap
+from pyscalambda.utility import convert_oprand, vmap
 
 
 class BaseFormula(object):
