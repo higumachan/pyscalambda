@@ -1,3 +1,3 @@
 test:
     post: 
-      - python -c 'import glob; import os; print("\n".join(["cp -r {} {}".format(coverage_path, os.path.join(os.environ["CIRCLE_ARTIFACTS"], coverage_path.split("/")[1], "coverage")) for coverage_path in glob.glob("/home/ubuntu/pyscalambda/.tox/py*/tmp/coverage/")]))' | sh 
+      - python -c 'import glob; import os; print("\n".join(["mkdir {} && cp -r {} {}".format(os.path.join(os.environ["CIRCLE_ARTIFACTS"], coverage_path.split("/")[5]), coverage_path, os.path.join(os.environ["CIRCLE_ARTIFACTS"], coverage_path.split("/")[5], "coverage")) for coverage_path in glob.glob("/home/ubuntu/pyscalambda/.tox/py*/tmp/coverage/")]))' | sh 
