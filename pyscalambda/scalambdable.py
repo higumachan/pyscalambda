@@ -4,7 +4,7 @@ from pyscalambda.formula import Formula
 
 from pyscalambda.formula_nodes import FunctionCall
 
-from pyscalambda.utility import convert_oprand, vmap
+from pyscalambda.utility import convert_operand, vmap
 
 
 def scalambdable_func(fn, *funcs):
@@ -20,7 +20,7 @@ def scalambdable_func(fn, *funcs):
             def is_scalambda_object(x):
                 return issubclass(x.__class__, Formula)
             if any(map(is_scalambda_object, args)) or any(map(is_scalambda_object, kwargs.values())):
-                args = [FunctionCall(f, list(map(convert_oprand, args)), vmap(convert_oprand, kwargs))]
+                args = [FunctionCall(f, list(map(convert_operand, args)), vmap(convert_operand, kwargs))]
                 kwargs = {}
             else:
                 args = [f(*args, **kwargs)]
