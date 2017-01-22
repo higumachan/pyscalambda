@@ -3,34 +3,34 @@ from pyscalambda.utility import convert_oprand, vmap
 
 class BaseFormula(object):
     def do_operator2(self, other, operator):
-        from operators import BinaryOperator
+        from pyscalambda.operators import BinaryOperator
 
         this = convert_oprand(self)
         other = convert_oprand(other)
         return BinaryOperator(operator, this, other)
 
     def rdo_operator2(self, other, operator):
-        from operators import BinaryOperator
+        from pyscalambda.operators import BinaryOperator
 
         this = convert_oprand(self)
         other = convert_oprand(other)
         return BinaryOperator(operator, other, this)
 
     def do_operator1(self, operator):
-        from operators import UnaryOperator
+        from pyscalambda.operators import UnaryOperator
 
         this = convert_oprand(self)
         return UnaryOperator(operator, this)
 
     def do_getitem(self, item):
-        from formula_nodes import GetItem
+        from pyscalambda.formula_nodes import GetItem
 
         this = convert_oprand(self)
         item = convert_oprand(item)
         return GetItem(this, item)
 
     def do_methodcall(self, method):
-        from formula_nodes import MethodCall
+        from pyscalambda.formula_nodes import MethodCall
 
         def f(*args, **kwargs):
             this = convert_oprand(self)
