@@ -8,6 +8,11 @@ from pyscalambda.utility import convert_oprand, vmap
 
 
 def scalambdable_func(fn, *funcs):
+    """
+    :type fn: (T)->U
+    :type funcs: list[(Any)->Any]
+    :rtype: (T)->U
+    """
     @functools.wraps(fn)
     def wraps(*args, **kwargs):
         for f in reversed([fn] + funcs):
