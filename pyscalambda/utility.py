@@ -10,7 +10,7 @@ def str_emmbed(value):
     return "'{}'".format(value) if isinstance(value, str) else str(value)
 
 
-def convert_oprand(x):
+def convert_operand(x):
     from pyscalambda.operands import ConstOperand, Underscore
     from pyscalambda.formula import Formula
 

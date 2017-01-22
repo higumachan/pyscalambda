@@ -1,44 +1,44 @@
-from pyscalambda.utility import convert_oprand, vmap
+from pyscalambda.utility import convert_operand, vmap
 
 
 class BaseFormula(object):
     def do_operator2(self, other, operator):
         from pyscalambda.operators import BinaryOperator
 
-        this = convert_oprand(self)
-        other = convert_oprand(other)
+        this = convert_operand(self)
+        other = convert_operand(other)
         return BinaryOperator(operator, this, other)
 
     def rdo_operator2(self, other, operator):
         from pyscalambda.operators import BinaryOperator
 
-        this = convert_oprand(self)
-        other = convert_oprand(other)
+        this = convert_operand(self)
+        other = convert_operand(other)
         return BinaryOperator(operator, other, this)
 
     def do_operator1(self, operator):
         from pyscalambda.operators import UnaryOperator
 
-        this = convert_oprand(self)
+        this = convert_operand(self)
         return UnaryOperator(operator, this)
 
     def do_getitem(self, item):
         from pyscalambda.formula_nodes import GetItem
 
-        this = convert_oprand(self)
-        item = convert_oprand(item)
+        this = convert_operand(self)
+        item = convert_operand(item)
         return GetItem(this, item)
 
     def do_methodcall(self, method):
         from pyscalambda.formula_nodes import MethodCall
 
         def f(*args, **kwargs):
-            this = convert_oprand(self)
+            this = convert_operand(self)
             return MethodCall(
                 this,
                 method,
-                list(map(convert_oprand, args)),
-                vmap(convert_oprand, kwargs)
+                list(map(convert_operand, args)),
+                vmap(convert_operand, kwargs)
             )
         return f
 
