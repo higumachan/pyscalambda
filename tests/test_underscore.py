@@ -144,3 +144,19 @@ class UnderscoreTest(TestCase):
             pass
 
         eq_(len((_ + A()).debug()[1]), 1)
+
+    def test_call_with_kwargs(self):
+        class A(object):
+            def test(self, test=10):
+                return test
+
+        a = A()
+        eq_((_.test(test=19))(a), 19)
+        eq_((_.test())(a), 10)
+
+        @SF
+        def func(x, y=10):
+            return x + y
+
+        eq_(func(10, y=_)(100), 110)
+        eq_(func(_, y=_)(10, 100), 110)
