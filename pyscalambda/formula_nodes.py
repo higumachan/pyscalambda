@@ -78,3 +78,25 @@ class FunctionCall(Formula):
         yield ('BIND_FUNC_{}'.format(self.id), self.func)
         for t in super(FunctionCall, self).traverse_const_values():
             yield t
+
+
+class If(Formula):
+    def __init__(self, cond, true, false):
+        super(If, self).__init__()
+        self.children = [cond, true, false]
+        self.cond = cond
+        self.true = true
+        self.false = false
+
+    def traverse(self):
+        yield '('
+        for t in self.true.traverse():
+            yield t
+        yield ' if '
+        for t in self.cond.traverse():
+            yield t
+        yield 'else '
+        for t in self.false.traverse():
+            yield t
+        yield ')'
+
