@@ -164,4 +164,3 @@ class UnderscoreTest(TestCase):
     def test_virtual_if(self):
         eq_(((_1 > 5).if_(_2 + 1, _2 + 2))(0, 10), 12)
         eq_(((_1 > 5).if_(_2 + 1, _2 + 2))(10, 10), 11)
-

@@ -99,4 +99,3 @@ class If(Formula):
         for t in self.false.traverse():
             yield t
         yield ')'
-
