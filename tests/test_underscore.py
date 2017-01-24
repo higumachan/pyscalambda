@@ -160,3 +160,8 @@ class UnderscoreTest(TestCase):
 
         eq_(func(10, y=_)(100), 110)
         eq_(func(_, y=_)(10, 100), 110)
+
+    def test_virtual_if(self):
+        eq_(((_1 > 5).if_(_2 + 1, _2 + 2))(0, 10), 12)
+        eq_(((_1 > 5).if_(_2 + 1, _2 + 2))(10, 10), 11)
+
