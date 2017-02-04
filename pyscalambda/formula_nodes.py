@@ -1,4 +1,5 @@
 from pyscalambda.formula import Formula
+from pyscalambda.utility import convert_operand
 
 
 class MethodCall(Formula):
@@ -78,3 +79,71 @@ class FunctionCall(Formula):
         yield ('BIND_FUNC_{}'.format(self.id), self.func)
         for t in super(FunctionCall, self).traverse_const_values():
             yield t
+
+
+class Quote(Formula):
+    COUNTER = 0
+
+    def __init__(self, formula):
+        super(Quote, self).__init__()
+        self.id = Quote.COUNTER
+        self.formula = formula
+        self.children = []
+        Quote.COUNTER += 1
+
+    def traverse(self):
+        yield '('
+        yield 'INNER_LAMBDA_{}'.format(self.id)
+        yield ')'
+
+    def traverse_const_values(self):
+        for const_value in self.formula.traverse_const_values():
+            yield const_value
+        from pyscalambda.scalambdable import scalambdable_func
+        yield (
+            'INNER_LAMBDA_{}'.format(self.id),
+            scalambdable_func(self.formula.get_lambda())
+        )
+
+
+class IfElse(Formula):
+    def __init__(self, cond, true, false):
+        super(IfElse, self).__init__()
+        self.children = [true, cond, false]
+        self.cond = cond
+        self.true = true
+        self.false = false
+
+    def traverse(self):
+        yield '('
+        for t in self.true.traverse():
+            yield t
+        yield ' if '
+        for t in self.cond.traverse():
+            yield t
+        yield 'else '
+        for t in self.false.traverse():
+            yield t
+        yield ')'
+
+
+class If(Formula):
+    def __init__(self, cond, true):
+        super(If, self).__init__()
+        self.children = [true, cond]
+        self.cond = cond
+        self.true = true
+
+    def else_(self, false):
+        return IfElse(self.cond, self.true, convert_operand(false))
+
+    def traverse(self):
+        yield '('
+        for t in self.true.traverse():
+            yield t
+        yield ' if '
+        for t in self.cond.traverse():
+            yield t
+        yield 'else '
+        yield 'None'
+        yield ')'
