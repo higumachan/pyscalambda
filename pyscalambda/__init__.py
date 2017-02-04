@@ -1,6 +1,6 @@
 from pyscalambda.operands import Underscore
 
-from pyscalambda.scalambdable import scalambdable_func
+from pyscalambda.scalambdable import scalambdable_const, scalambdable_func
 
 _ = Underscore(0)
 _1 = Underscore(1)
@@ -13,5 +13,6 @@ _7 = Underscore(7)
 _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
+SC = scalambdable_const
 
-__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF",)
+__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF", "SC")
