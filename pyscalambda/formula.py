@@ -1,4 +1,5 @@
 from pyscalambda.base_formula import BaseFormula
+from pyscalambda.utility import convert_operand
 
 
 class Formula(BaseFormula):
@@ -48,6 +49,10 @@ class Formula(BaseFormula):
 
     def __call__(self, *args):
         return self.get_lambda()(*args)
+
+    def if_(self, cond):
+        from pyscalambda.formula_nodes import If
+        return If(convert_operand(cond), convert_operand(self))
 
     def traverse_const_values(self):
         for child in self.children:
