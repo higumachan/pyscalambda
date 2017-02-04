@@ -1,10 +1,6 @@
-import functools
-
-from pyscalambda.formula import Formula
-
 from pyscalambda.formula_nodes import Quote
 
-from pyscalambda.utility import convert_operand, vmap
+from pyscalambda.utility import convert_operand
 
 
 def quote(formula):

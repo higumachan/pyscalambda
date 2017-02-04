@@ -82,6 +82,7 @@ class FunctionCall(Formula):
 
 class Quote(Formula):
     COUNTER = 0
+
     def __init__(self, formula):
         super(Quote, self).__init__()
         self.id = Quote.COUNTER

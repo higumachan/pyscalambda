@@ -1,8 +1,8 @@
 from pyscalambda.operands import Underscore
 
-from pyscalambda.scalambdable import scalambdable_func
-
 from pyscalambda.quote import quote
+
+from pyscalambda.scalambdable import scalambdable_func
 
 _ = Underscore(0)
 _1 = Underscore(1)

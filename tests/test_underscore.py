@@ -5,7 +5,7 @@ from nose.tools import (
     eq_,
     raises
 )
-from pyscalambda import SF, _, _1, _2, Q
+from pyscalambda import Q, SF, _, _1, _2
 
 
 class UnderscoreTest(TestCase):
