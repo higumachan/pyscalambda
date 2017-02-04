@@ -1,5 +1,7 @@
 from pyscalambda.operands import Underscore
 
+from pyscalambda.quote import quote
+
 from pyscalambda.scalambdable import scalambdable_func
 
 _ = Underscore(0)
@@ -13,5 +15,6 @@ _7 = Underscore(7)
 _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
+Q = quote
 
-__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF",)
+__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF", "Q")

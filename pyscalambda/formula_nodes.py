@@ -81,6 +81,31 @@ class FunctionCall(Formula):
             yield t
 
 
+class Quote(Formula):
+    COUNTER = 0
+
+    def __init__(self, formula):
+        super(Quote, self).__init__()
+        self.id = Quote.COUNTER
+        self.formula = formula
+        self.children = []
+        Quote.COUNTER += 1
+
+    def traverse(self):
+        yield '('
+        yield 'INNER_LAMBDA_{}'.format(self.id)
+        yield ')'
+
+    def traverse_const_values(self):
+        for const_value in self.formula.traverse_const_values():
+            yield const_value
+        from pyscalambda.scalambdable import scalambdable_func
+        yield (
+            'INNER_LAMBDA_{}'.format(self.id),
+            scalambdable_func(self.formula.get_lambda())
+        )
+
+
 class IfElse(Formula):
     def __init__(self, cond, true, false):
         super(IfElse, self).__init__()
