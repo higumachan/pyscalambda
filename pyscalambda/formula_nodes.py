@@ -104,8 +104,8 @@ class Quote(Formula):
             'INNER_LAMBDA_{}'.format(self.id),
             scalambdable_func(self.formula.get_lambda())
         )
-        
-        
+
+
 class IfElse(Formula):
     def __init__(self, cond, true, false):
         super(IfElse, self).__init__()
