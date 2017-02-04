@@ -4,7 +4,7 @@ from pyscalambda.formula import Formula
 
 from pyscalambda.formula_nodes import FunctionCall
 
-from pyscalambda.operands import ConstOperand
+from pyscalambda.operands import ConstOperand, DeepConstOperand
 
 from pyscalambda.utility import convert_operand, vmap
 
@@ -33,3 +33,7 @@ def scalambdable_func(fn, *funcs):
 
 def scalambdable_const(value):
     return ConstOperand(value)
+
+
+def scalambdable_deep_const(value):
+    return DeepConstOperand(value)
