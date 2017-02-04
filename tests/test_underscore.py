@@ -162,4 +162,4 @@ class UnderscoreTest(TestCase):
         eq_(func(_, y=_)(10, 100), 110)
 
     def test_quote(self):
-        eq_(SF(sum, map)(Q(_ + 1))([1, 2, 3]), 9)
+        eq_(SF(sum, map)(Q(_ + 1), _)([1, 2, 3]), 9)
