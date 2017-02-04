@@ -3,7 +3,8 @@ from unittest import TestCase
 
 from nose.tools import (
     eq_,
-    raises
+    raises,
+    assert_is_not
 )
 
 from pyscalambda import Q, SC, SF, _, _1, _2
@@ -174,3 +175,9 @@ class UnderscoreTest(TestCase):
         eq_((_2 + 1).if_(_1 < 5).else_(_2 + 2)(10, 10), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 10, 12), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 0, 12), 11)
+
+    def test_deep_const(self):
+        l = [1, 2, 3]
+        assert_is_not(D(_)(l), l)
+        eq_((D(_).append(4))(l), [1, 2, 3, 4])
+        eq_(l, [1, 2, 3])
