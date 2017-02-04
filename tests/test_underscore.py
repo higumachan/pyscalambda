@@ -5,7 +5,7 @@ from nose.tools import (
     eq_,
     raises
 )
-from pyscalambda import SF, _, _1, _2
+from pyscalambda import SC, SF, _, _1, _2
 
 
 class UnderscoreTest(TestCase):
@@ -160,3 +160,7 @@ class UnderscoreTest(TestCase):
 
         eq_(func(10, y=_)(100), 110)
         eq_(func(_, y=_)(10, 100), 110)
+
+    def test_scalambdable_const(self):
+        eq_(SC(10)(), 10)
+        eq_((SC(10) * 10)(), 100)
