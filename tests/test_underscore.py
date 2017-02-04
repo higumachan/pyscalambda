@@ -5,7 +5,8 @@ from nose.tools import (
     eq_,
     raises
 )
-from pyscalambda import Q, SF, _, _1, _2
+
+from pyscalambda import Q, SC, SF, _, _1, _2
 
 
 class UnderscoreTest(TestCase):
@@ -160,6 +161,10 @@ class UnderscoreTest(TestCase):
 
         eq_(func(10, y=_)(100), 110)
         eq_(func(_, y=_)(10, 100), 110)
+
+    def test_scalambdable_const(self):
+        eq_(SC(10)(), 10)
+        eq_((SC(10) * 10)(), 100)
 
     def test_quote(self):
         eq_(SF(sum, map)(Q(_ + 1), _)([1, 2, 3]), 9)

@@ -4,6 +4,8 @@ from pyscalambda.formula import Formula
 
 from pyscalambda.formula_nodes import FunctionCall
 
+from pyscalambda.operands import ConstOperand
+
 from pyscalambda.utility import convert_operand, vmap
 
 
@@ -27,3 +29,7 @@ def scalambdable_func(fn, *funcs):
                 kwargs = {}
         return args[0]
     return wrapped if funcs else functools.wraps(fn)(wrapped)
+
+
+def scalambdable_const(value):
+    return ConstOperand(value)
