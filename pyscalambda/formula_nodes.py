@@ -1,4 +1,5 @@
 from pyscalambda.formula import Formula
+from pyscalambda.utility import convert_operand
 
 
 class MethodCall(Formula):
@@ -80,10 +81,10 @@ class FunctionCall(Formula):
             yield t
 
 
-class If(Formula):
+class IfElse(Formula):
     def __init__(self, cond, true, false):
-        super(If, self).__init__()
-        self.children = [cond, true, false]
+        super(IfElse, self).__init__()
+        self.children = [true, cond,  false]
         self.cond = cond
         self.true = true
         self.false = false
@@ -99,3 +100,27 @@ class If(Formula):
         for t in self.false.traverse():
             yield t
         yield ')'
+
+
+class If(Formula):
+    def __init__(self, cond, true):
+        super(If, self).__init__()
+        self.children = [true, cond]
+        self.cond = cond
+        self.true = true
+
+    def else_(self, false):
+        return IfElse(self.cond, self.true, convert_operand(false))
+
+    def traverse(self):
+        yield '('
+        for t in self.true.traverse():
+            yield t
+        yield ' if '
+        for t in self.cond.traverse():
+            yield t
+        yield 'else '
+        yield 'None'
+        yield ')'
+
+
