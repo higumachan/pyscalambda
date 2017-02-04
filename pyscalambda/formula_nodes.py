@@ -84,7 +84,7 @@ class FunctionCall(Formula):
 class IfElse(Formula):
     def __init__(self, cond, true, false):
         super(IfElse, self).__init__()
-        self.children = [true, cond,  false]
+        self.children = [true, cond, false]
         self.cond = cond
         self.true = true
         self.false = false
@@ -122,5 +122,3 @@ class If(Formula):
         yield 'else '
         yield 'None'
         yield ')'
-
-
