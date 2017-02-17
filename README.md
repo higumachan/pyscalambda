@@ -4,11 +4,11 @@
 [![CircleCI](https://circleci.com/gh/higumachan/pyscalambda.svg?style=svg)](https://circleci.com/gh/higumachan/pyscalambda)
 
 ## Description
-Scalaの
+This libraly for writing scala like lambda formula
+e.g.
 ```scala
 (_ + _)(1, 2)
 ```
-みたいな感じのラムダ式を書くためのライブラリ
 
 ## How to use
 
@@ -28,22 +28,153 @@ reduce(_ + _, [1, 2, 3, 4]) #== reduce(lambda x, y: x + y, [1, 2, 3, 4]) == 10
 
 ## more detail use
 
-### scalambdable_function
-_以外にもSFという、関数をラッピングする関数を用意しています。
-_を引数に含むような関数呼び出しを行う場合は、呼び出したい関数をSFでラップしてください。
 
-```py
-from pyscalambda import _, SF
-	
-map(SF(len)(_) + 1, [[1], [1, 2], [1, 2, 3]]) #== map(lambda x: len(x) + 1, [[1], [1, 2], [1, 2, 3]]) == [2, 3, 4]
-```
+### Multi access variable
 
-### 複数回使用する引数
-lambda式の中で複数回参照する引数は_1 ~ _9と言うものを用意してあります。
-_1 ~ _9は出現の順序ではなく1~9の数字で引数の順番が変わります。
+If variable use many times in lambda formula, then you can use _1 to _9.
+
 ```py
 from pyscalambda import _1, _2
 
-(_1 * _1 + _2 * _1)(10, 20) # == 10 * 10 + 20 * 10 == 300
-(_2 * _2 + _1 * _2)(10, 20) # == 20 * 20 + 10 * 20 == 600
+(_1 * _1 + _2 * _1)(10, 20) # ==  (lambda x, y: x * x + y * x)(10, 20) ==  300
+(_2 * _2 + _1 * _2)(10, 20) # == (lambda x, y: y * y + x * y)(10, 20) == 600
 ```
+
+#### Cautation
+
+* We can't use _ and _1 to _9 in same time. *
+
+```py
+(_ + _1)(1, 2) # raising SyntaxError
+```
+
+### Scalambdable_function (SF)
+If you want to replace to pyscalambda this code.
+```py
+map(lambda x: len(x) + 1,  [[1], [1, 2], [1, 2, 3]])
+```
+
+But _ can't hook function callee.
+Scalambdable function can be solve such a case
+
+e.g.
+```py
+from pyscalambda import _, SF # SF is scalambdable function's alias
+
+map(SF(len)(_) + 1, [[1], [1, 2], [1, 2, 3]]) #== map(lambda x: len(x) + 1, [[1], [1, 2], [, 2, 3]]) == [2, 3, 4]
+```
+
+SF can also be used as a decorator when use define function case
+e.g.
+
+```py
+from pyscalambda import _, SF # SF is scalambdable function's alias
+
+@SF
+def func(x):
+    return x + 1
+
+
+map(func(_) * 2, [1, 2, 3]) #== map(lambda x: func(x) + 1, [1, 2, 3]) == [4, 6, 8]
+```
+
+If you use nesting SF, you can refactor to SF multi arguments. (composition of functions)
+e.g.
+
+```py
+from pyscalambda import _, SF
+
+def func(x):
+    return x ** x
+
+map(SF(func)(SF(len))(_), [1, 2, 3]))
+```
+
+This code replace to that code
+
+```py
+from pyscalambda import _, SF
+
+def func(x):
+    return x ** x
+
+map(SF(func, len))(_), [1, 2, 3]))
+```
+
+### Scalambdable_iterator (SI)
+
+If you want to replace to pyscalambda this code.
+
+```py
+map(lambda x: (x[0] + 1, x[1] + 20),  [(1, 2), (3, 4)])
+map(lambda x: ({"x + 1": x + 1, "x + 2": x + 2),  [1, 2])
+```
+
+But _ can't hook contruction iterative some thing.
+Scalambdable iterator can be solve such a case.
+
+```py
+from pyscalambda import _, SI # SI is scalambdable iterators's alias
+
+map(SI((_[0] + 1, _[1] + 2)),  [(1, 2), (3, 4)])
+map(SI({"x + 1": _ + 1, "x + 2": _ + 2),  [1, 2])
+```
+
+### Quote (Q)
+
+Quote is in order to realize "lambda in lambda" on pyscalambda.
+
+If you want to replace to pyscalambda this code.
+
+```py
+map(lambda x: reduce(lambda y, z: y ** z, x),  [[1, 2], [3, 4]])
+```
+
+But this program directly replacing.
+
+```py
+# WARING: This program is wrong
+from pyscalambda import _
+
+map(SF(reduce)(_ ** _, _), [[1, 2], [3, 4])
+```
+
+This program convert to
+
+```py
+map(lambda x, y, z: reduce(y ** z, x),  [[1, 2], [3, 4]])
+```
+
+Because replace _ dosen't have hierarchy (like indent)
+
+Quote can be solve such a case.
+
+```py
+from pyscalambda import _, Q
+
+map(SF(reduce)(Q(_ ** _), _), [[1, 2], [3, 4])
+```
+
+This program is correct to replace.
+
+### Virtual if
+
+"Virtual if" is a "move like a ternary conditional operator" methods.
+
+If you want to replace to pyscalambda this code.
+
+```py
+map(lambda x: x if x == 0 else -1, [1, 2, 0, 4])
+```
+
+But _ can't hook ternary conditional operator
+
+"Virtual if" feature can be solve such a case
+
+```py
+from pyscalambda import _
+
+map(_.if_(_ == x).else_(-1), [1, 2, None, 4])
+```
+
+
