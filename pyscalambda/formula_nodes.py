@@ -177,7 +177,7 @@ class MakeDictionary(Formula):
         self.keys = list(keys)
         self.values = list(values)
         self.type = type
-        self.children = sum(zip(self.keys, self.values), ())
+        self.children = self.keys + self.values
 
     def traverse(self):
         yield '{'
