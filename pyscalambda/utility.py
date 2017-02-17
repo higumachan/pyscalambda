@@ -19,3 +19,13 @@ def convert_operand(x):
     if isinstance(x, Underscore) and x.id == 0:
         return Underscore()
     return x
+
+
+def is_scalambda_object(x):
+    from pyscalambda.formula import Formula
+    return issubclass(x.__class__, Formula)
+
+
+def is_unnamed_underscore(x):
+    from pyscalambda.operands import Underscore
+    return issubclass(x.__class__, Underscore) and (x.id == 0 or x.id > 10)

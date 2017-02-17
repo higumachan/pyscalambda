@@ -91,6 +91,10 @@ class Quote(Formula):
         self.children = []
         Quote.COUNTER += 1
 
+    def __call__(self, *args, **kwargs):
+        kwargs = dict(map(lambda x: (x[0], convert_operand(x[1])), kwargs.items()))
+        return self.formula(*map(convert_operand, args), **kwargs)
+
     def traverse(self):
         yield '('
         yield 'INNER_LAMBDA_{}'.format(self.id)
@@ -147,3 +151,41 @@ class If(Formula):
         yield 'else '
         yield 'None'
         yield ')'
+
+
+class MakeIterator(Formula):
+    def __init__(self, iter, opener, closer):
+        super(MakeIterator, self).__init__()
+        self.iter = list(iter)
+        self.type = type
+        self.children = self.iter
+        self.opener = opener
+        self.closer = closer
+
+    def traverse(self):
+        yield self.opener
+        for item in self.iter:
+            for t in item.traverse():
+                yield t
+            yield ','
+        yield self.closer
+
+
+class MakeDictionary(Formula):
+    def __init__(self, keys, values):
+        super(MakeDictionary, self).__init__()
+        self.keys = list(keys)
+        self.values = list(values)
+        self.type = type
+        self.children = self.keys + self.values
+
+    def traverse(self):
+        yield '{'
+        for k, v in zip(self.keys, self.values):
+            for t in k.traverse():
+                yield t
+            yield ':'
+            for t in v.traverse():
+                yield t
+            yield ','
+        yield '}'
