@@ -118,10 +118,10 @@ But _ can't hook contruction iterative some thing.
 Scalambdable iterator can be solve such a case.
 
 ```py
-from pyscalambda import _, SI # SI is scalambdable iterators's alias
+from pyscalambda import _, _1, SI # SI is scalambdable iterators's alias
 
 map(SI((_[0] + 1, _[1] + 2)),  [(1, 2), (3, 4)])
-map(SI({"x + 1": _ + 1, "x + 2": _ + 2),  [1, 2])
+map(SI({"x + 1": _1 + 1, "x + 2": _1 + 2),  [1, 2]) # this case can't use _. because can't deceide argument order.
 ```
 
 ### Quote (Q)
