@@ -28,17 +28,30 @@ class ConstOperand(Operand):
             yield ('CONST_{}'.format(self.id), self.value)
 
 
+class UndefinedConstOperand(Operand):
+
+    def __init__(self, value_name):
+        super(UndefinedConstOperand, self).__init__()
+        self.value_name = value_name
+
+    def traverse(self):
+        yield '('
+        yield self.value_name
+        yield ')'
+
+
 class Underscore(Operand):
     NUMBER_CONSTIZE = 10
     COUNTER = NUMBER_CONSTIZE
 
-    def __init__(self, id=None):
+    def __init__(self, id=None, in_arglist=True):
         super(Underscore, self).__init__()
         if id is None:
             self.id = Underscore.COUNTER
             Underscore.COUNTER += 1
         else:
             self.id = id
+        self.in_arglist = in_arglist
 
     def traverse(self):
         yield '('
@@ -46,9 +59,12 @@ class Underscore(Operand):
         yield ')'
 
     def traverse_args(self):
-        if self.id >= Underscore.NUMBER_CONSTIZE:
+        if self.in_arglist and not isinstance(self.id, str) and self.id >= Underscore.NUMBER_CONSTIZE:
             yield "___ARG{}___".format(self.id)
 
     def traverse_constize_args(self):
-        if self.id < Underscore.NUMBER_CONSTIZE:
+        if self.in_arglist and (isinstance(self.id, str) or self.id < Underscore.NUMBER_CONSTIZE):
             yield "___ARG{}___".format(self.id)
+
+    def is_named(self):
+        return id == 0 or id >= Underscore.NUMBER_CONSTIZE

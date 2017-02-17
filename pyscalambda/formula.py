@@ -34,7 +34,8 @@ class Formula(BaseFormula):
         elif len(unnamed_args) == 0:
             args = ",".join(constized_args)
         else:
-            raise SyntaxError("_ and _1 ~ _9 can not be used at the same time.")
+            raise SyntaxError("_ and _1 ~ _9 can not be used at the same time. {} {}".
+                              format(constized_args, unnamed_args))
         return "lambda {}:{}".format(args, body)
 
     def create_lambda(self):

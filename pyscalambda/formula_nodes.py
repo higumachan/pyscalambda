@@ -162,7 +162,6 @@ class MakeIterator(Formula):
         self.opener = opener
         self.closer = closer
 
-
     def traverse(self):
         yield self.opener
         for item in self.iter:
@@ -178,7 +177,7 @@ class MakeDictionary(Formula):
         self.keys = list(keys)
         self.values = list(values)
         self.type = type
-        self.children = self.keys + self.values
+        self.children = sum(zip(self.keys, self.values), ())
 
     def traverse(self):
         yield '{'
@@ -190,4 +189,3 @@ class MakeDictionary(Formula):
                 yield t
             yield ','
         yield '}'
-

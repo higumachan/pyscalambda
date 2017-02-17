@@ -1,36 +1,40 @@
+import random
+
+from importlib import import_module
+
 from pyscalambda.utility import convert_operand, vmap
 
 
 class BaseFormula(object):
     def do_operator2(self, other, operator):
-        from pyscalambda.operators import BinaryOperator
+        BinaryOperator = import_module("pyscalambda.operators").BinaryOperator
 
         this = convert_operand(self)
         other = convert_operand(other)
         return BinaryOperator(operator, this, other)
 
     def rdo_operator2(self, other, operator):
-        from pyscalambda.operators import BinaryOperator
+        BinaryOperator = import_module("pyscalambda.operators").BinaryOperator
 
         this = convert_operand(self)
         other = convert_operand(other)
         return BinaryOperator(operator, other, this)
 
     def do_operator1(self, operator):
-        from pyscalambda.operators import UnaryOperator
+        UnaryOperator = import_module("pyscalambda.operators").UnaryOperator
 
         this = convert_operand(self)
         return UnaryOperator(operator, this)
 
     def do_getitem(self, item):
-        from pyscalambda.formula_nodes import GetItem
+        GetItem = import_module("pyscalambda.formula_nodes").GetItem
 
         this = convert_operand(self)
         item = convert_operand(item)
         return GetItem(this, item)
 
     def do_methodcall(self, method):
-        from pyscalambda.formula_nodes import MethodCall
+        MethodCall = import_module("pyscalambda.formula_nodes").MethodCall
 
         def f(*args, **kwargs):
             this = convert_operand(self)
@@ -166,7 +170,16 @@ class BaseFormula(object):
         return self.do_operator1("~")
 
     def __getattr__(self, method):
+        if method == '__setstate__' or method == 'id':
+            return None
         return self.do_methodcall(method)
 
     def __getitem__(self, key):
         return self.do_getitem(key)
+
+    def __getstate__(self):
+        ignore_member = {'cache_lambda', 'cache_consts'}
+        return {k: (v if k not in ignore_member else None) for k, v in self.__dict__.items()}
+
+    def __hash__(self):
+        return random.randint(0, 10000000)
