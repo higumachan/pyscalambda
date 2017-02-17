@@ -6,6 +6,7 @@
 ## Description
 This libraly for writing scala like lambda formula
 e.g.
+
 ```scala
 (_ + _)(1, 2)
 ```
@@ -58,13 +59,15 @@ But _ can't hook function callee.
 Scalambdable function can be solve such a case
 
 e.g.
+
 ```py
 from pyscalambda import _, SF # SF is scalambdable function's alias
 
 map(SF(len)(_) + 1, [[1], [1, 2], [1, 2, 3]]) #== map(lambda x: len(x) + 1, [[1], [1, 2], [, 2, 3]]) == [2, 3, 4]
 ```
 
-SF can also be used as a decorator when use define function case
+SF can also be used as a decorator when use define function case  
+
 e.g.
 
 ```py
@@ -78,7 +81,8 @@ def func(x):
 map(func(_) * 2, [1, 2, 3]) #== map(lambda x: func(x) + 1, [1, 2, 3]) == [4, 6, 8]
 ```
 
-If you use nesting SF, you can refactor to SF multi arguments. (composition of functions)
+If you use nesting SF, you can refactor to SF multi arguments. (composition of functions)  
+
 e.g.
 
 ```py
@@ -110,7 +114,7 @@ map(lambda x: (x[0] + 1, x[1] + 20),  [(1, 2), (3, 4)])
 map(lambda x: ({"x + 1": x + 1, "x + 2": x + 2),  [1, 2])
 ```
 
-But _ can't hook contruction iterative some thing.
+But _ can't hook contruction iterative some thing.  
 Scalambdable iterator can be solve such a case.
 
 ```py
@@ -125,7 +129,6 @@ map(SI({"x + 1": _ + 1, "x + 2": _ + 2),  [1, 2])
 Quote is in order to realize "lambda in lambda" on pyscalambda.
 
 If you want to replace to pyscalambda this code.
-
 ```py
 map(lambda x: reduce(lambda y, z: y ** z, x),  [[1, 2], [3, 4]])
 ```
