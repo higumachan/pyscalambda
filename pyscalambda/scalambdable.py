@@ -2,7 +2,7 @@ import functools
 
 from pyscalambda.formula import Formula
 
-from pyscalambda.formula_nodes import FunctionCall
+from pyscalambda.formula_nodes import FunctionCall, MakeIterator, MakeDictionary
 
 from pyscalambda.operands import ConstOperand
 
@@ -31,5 +31,21 @@ def scalambdable_func(fn, *funcs):
     return wrapped if funcs else functools.wraps(fn)(wrapped)
 
 
+def scalambdable_iterator(iter):
+    wrappers = {
+        list: ('[', ']'),
+        tuple: ('(', ')'),
+        set: ('{', '}'),
+    }
+    if isinstance(iter, (list, tuple, set)):
+        iter_type = type(iter)
+        iter = map(convert_operand, iter)
+        return MakeIterator(iter, *wrappers[iter_type])
+    keys = map(convert_operand, iter.keys())
+    values = map(convert_operand, iter.values())
+    return MakeDictionary(keys, values)
+
+
 def scalambdable_const(value):
     return ConstOperand(value)
+
