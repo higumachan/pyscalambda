@@ -188,7 +188,6 @@ class UnderscoreTest(TestCase):
         eq_(SI({"a": _1, "b": 2})(10), {"a": 10, "b": 2})
         eq_(SI({_1: _2, _3: 2})("a", 20, "c"), {"a": 20, "c": 2})
 
-
     @raises(SyntaxError)
     def test_scalambda_iterator_dict_syntax_error1(self):
         eq_(SI({_: _, "b": _})("k", 10, 20), {"k": 10, "b": 20}) # because can't decide argument order
