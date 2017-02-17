@@ -6,7 +6,7 @@ from nose.tools import (
     raises
 )
 
-from pyscalambda import Q, SC, SF, _, _1, _2
+from pyscalambda import Q, SC, SF, SI, _, _1, _2, _3
 
 
 class UnderscoreTest(TestCase):
@@ -174,3 +174,29 @@ class UnderscoreTest(TestCase):
         eq_((_2 + 1).if_(_1 < 5).else_(_2 + 2)(10, 10), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 10, 12), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 0, 12), 11)
+
+    def test_scalambdable_iterator(self):
+        eq_(SI([1, 2, 3])(), [1, 2, 3])
+        eq_(SI([1, _, 3])(10), [1, 10, 3])
+
+        eq_(SI((1, 2, 3))(), (1, 2, 3))
+        eq_(SI((1, _, 3))(10), (1, 10, 3))
+
+        eq_(SI({1, 2, _1})(10), {1, 2, 10})
+
+        eq_(SI({"a": 1, "b": 2})(), {"a": 1, "b": 2})
+        eq_(SI({"a": _1, "b": 2})(10), {"a": 10, "b": 2})
+        eq_(SI({_1: _2, _3: 2})("a", 20, "c"), {"a": 20, "c": 2})
+
+
+    @raises(SyntaxError)
+    def test_scalambda_iterator_dict_syntax_error1(self):
+        eq_(SI({_: _, "b": _})("k", 10, 20), {"k": 10, "b": 20}) # because can't decide argument order
+
+    @raises(SyntaxError)
+    def test_scalambda_iterator_dict_syntax_error2(self):
+        eq_(SI({_: 2, _: 1})("a", "c"), {"a": 2, "c": 1}) # because can't decide argument order
+
+    @raises(SyntaxError)
+    def test_scalambda_iterator_set_syntax_error(self):
+        eq_(SI({1, 2, _})(10), {1, 2, 10}) # because can't decide argument order
