@@ -4,7 +4,7 @@
 [![CircleCI](https://circleci.com/gh/higumachan/pyscalambda.svg?style=svg)](https://circleci.com/gh/higumachan/pyscalambda)
 
 ## Description
-This libraly for writing scala like lambda formula
+This is a library for writing scala like lambda formulas in python
 e.g.
 
 ```scala
@@ -27,12 +27,12 @@ filter(_.isdigit(), "ab123aad") #==  filter(lambda x: x.isdigit(), "aabb123cc") 
 reduce(_ + _, [1, 2, 3, 4]) #== reduce(lambda x, y: x + y, [1, 2, 3, 4]) == 10
 ```
 
-## more detail use
+## Use Details
 
 
 ### Multi access variable
 
-If variable use many times in lambda formula, then you can use _1 to _9.
+If a variable is used multiple times in a lambda formula, use _1 to _9 to reduce syntax.
 
 ```py
 from pyscalambda import _1, _2
@@ -41,22 +41,22 @@ from pyscalambda import _1, _2
 (_2 * _2 + _1 * _2)(10, 20) # == (lambda x, y: y * y + x * y)(10, 20) == 600
 ```
 
-#### Cautation
+#### Caution
 
-* We can't use _ and _1 to _9 in same time. *
+* Don't use _ and _1 to _9 in same time. *
 
 ```py
 (_ + _1)(1, 2) # raising SyntaxError
 ```
 
 ### Scalambdable_function (SF)
-If you want to replace to pyscalambda this code.
+To convert to pyscalambda for this example code.
 ```py
 map(lambda x: len(x) + 1,  [[1], [1, 2], [1, 2, 3]])
 ```
 
-But _ can't hook function callee.
-Scalambdable function can be solve such a case
+But _ can't hook function caller.
+Scalambdable function solve such cases
 
 e.g.
 
@@ -66,7 +66,7 @@ from pyscalambda import _, SF # SF is scalambdable function's alias
 map(SF(len)(_) + 1, [[1], [1, 2], [1, 2, 3]]) #== map(lambda x: len(x) + 1, [[1], [1, 2], [, 2, 3]]) == [2, 3, 4]
 ```
 
-SF can also be used as a decorator when use define function case  
+SF can also be used as a decorator when user define function case  
 
 e.g.
 
@@ -94,7 +94,7 @@ def func(x):
 map(SF(func)(SF(len))(_), [1, 2, 3]))
 ```
 
-This code replace to that code
+Above code can be replaces as:
 
 ```py
 from pyscalambda import _, SF
@@ -107,15 +107,15 @@ map(SF(func, len))(_), [1, 2, 3]))
 
 ### Scalambdable_iterator (SI)
 
-If you want to replace to pyscalambda this code.
+Following code can be converted to pyscalambda api as :
 
 ```py
 map(lambda x: (x[0] + 1, x[1] + 20),  [(1, 2), (3, 4)])
 map(lambda x: ({"x + 1": x + 1, "x + 2": x + 2),  [1, 2])
 ```
 
-But _ can't hook contruction iterative some thing.  
-Scalambdable iterator can be solve such a case.
+But _ can't hook contruction iterator.  
+Scalambdable iterator can solve this.
 
 ```py
 from pyscalambda import _, _1, SI # SI is scalambdable iterators's alias
@@ -128,12 +128,12 @@ map(SI({"x + 1": _1 + 1, "x + 2": _1 + 2),  [1, 2]) # this case can't use _. bec
 
 Quote is in order to realize "lambda in lambda" on pyscalambda.
 
-If you want to replace to pyscalambda this code.
+Example:
 ```py
 map(lambda x: reduce(lambda y, z: y ** z, x),  [[1, 2], [3, 4]])
 ```
 
-But this program directly replacing.
+By directly replacing.
 
 ```py
 # WARING: This program is wrong
@@ -142,7 +142,7 @@ from pyscalambda import _
 map(SF(reduce)(_ ** _, _), [[1, 2], [3, 4])
 ```
 
-This program convert to
+This program convert to 
 
 ```py
 map(lambda x, y, z: reduce(y ** z, x),  [[1, 2], [3, 4]])
@@ -150,7 +150,7 @@ map(lambda x, y, z: reduce(y ** z, x),  [[1, 2], [3, 4]])
 
 Because replace _ dosen't have hierarchy (like indent)
 
-Quote can be solve such a case.
+Quote solve this.
 
 ```py
 from pyscalambda import _, Q
