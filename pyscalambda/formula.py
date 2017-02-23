@@ -56,16 +56,16 @@ class Formula(BaseFormula):
         return If(convert_operand(cond), convert_operand(self))
 
     def and_(self, other):
-        from pyscalambda.formula_nodes import And
+        from pyscalambda.operators import BinaryOperator
         if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
-        return And(self, other)
+        return BinaryOperator("and", self, other)
 
     def or_(self, other):
-        from pyscalambda.formula_nodes import Or
+        from pyscalambda.operators import BinaryOperator
         if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
-        return Or(self, other)
+        return BinaryOperator("or", self, other)
 
     def traverse_const_values(self):
         for child in self.children:
