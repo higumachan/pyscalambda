@@ -1,5 +1,5 @@
 from pyscalambda.base_formula import BaseFormula
-from pyscalambda.utility import convert_operand
+from pyscalambda.utility import convert_operand, is_scalambda_object
 
 
 class Formula(BaseFormula):
@@ -57,13 +57,13 @@ class Formula(BaseFormula):
 
     def and_(self, other):
         from pyscalambda.formula_nodes import And
-        if not issubclass(other.__class__, Formula):
+        if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
         return And(self, other)
 
     def or_(self, other):
         from pyscalambda.formula_nodes import Or
-        if not issubclass(other.__class__, Formula):
+        if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
         return Or(self, other)
 
