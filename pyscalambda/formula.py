@@ -57,6 +57,8 @@ class Formula(BaseFormula):
 
     def in_(self, iterator):
         from pyscalambda.formula_nodes import In
+        if not hasattr(iterator, "__iter__"):
+            raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
         return In(convert_operand(self), convert_operand(iterator))
 
     def traverse_const_values(self):
