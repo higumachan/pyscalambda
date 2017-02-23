@@ -11,6 +11,5 @@ setup(
     author_email='harekumo792154@gmail.com',
     license='MIT',
     url='https://github.com/higumachan/pyscalambda',
-    #package_dir={'pyscalambda': 'pyscalambda/'}
     packages=["pyscalambda"],
 )
