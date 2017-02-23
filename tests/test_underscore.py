@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from nose.tools import (
     eq_,
+    ok_,
     raises
 )
 
@@ -201,3 +202,14 @@ class UnderscoreTest(TestCase):
     @raises(SyntaxError)
     def test_scalambda_iterator_set_syntax_error(self):
         eq_(SI({1, 2, _})(10), {1, 2, 10}) # because can't decide argument order
+
+    def test_virtual_in(self):
+        for iter_class in [set, list, tuple]:
+            ok_(SC(1).in_(_)(iter_class([1, 2, 3])))
+            ok_(not SC(4).in_(_)(iter_class([1, 2, 3])))
+            ok_(_.in_(_)(2, iter_class([1, 2, 3])))
+
+    @raises(TypeError)
+    def test_virtual_in_type_error(self):
+        _.in_(12)(100)
+
