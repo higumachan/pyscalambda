@@ -189,3 +189,36 @@ class MakeDictionary(Formula):
                 yield t
             yield ','
         yield '}'
+
+
+class Logic(Formula):
+    OPERATOR = None
+
+    def __init__(self, left, right):
+        super(Logic, self).__init__()
+        self.left = left
+        self.right = right
+        self.children = [self.left, self.right]
+
+    def traverse(self):
+        yield '('
+        for t in self.left.traverse():
+            yield t
+        yield ' {} '.format(self.OPERATOR)
+        for t in self.right.traverse():
+            yield t
+        yield ')'
+
+
+class And(Logic):
+    OPERATOR = 'and'
+
+    def __init__(self, left, right):
+        super(And, self).__init__(left, right)
+
+
+class Or(Logic):
+    OPERATOR = 'or'
+
+    def __init__(self, left, right):
+        super(Or, self).__init__(left, right)

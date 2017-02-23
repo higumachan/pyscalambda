@@ -55,6 +55,18 @@ class Formula(BaseFormula):
         from pyscalambda.formula_nodes import If
         return If(convert_operand(cond), convert_operand(self))
 
+    def and_(self, other):
+        from pyscalambda.formula_nodes import And
+        if not issubclass(other.__class__, Formula):
+            raise TypeError("other is only scalambdable object")
+        return And(self, other)
+
+    def or_(self, other):
+        from pyscalambda.formula_nodes import Or
+        if not issubclass(other.__class__, Formula):
+            raise TypeError("other is only scalambdable object")
+        return Or(self, other)
+
     def traverse_const_values(self):
         for child in self.children:
             for t in child.traverse_const_values():
