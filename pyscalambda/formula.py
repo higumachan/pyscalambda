@@ -55,6 +55,10 @@ class Formula(BaseFormula):
         from pyscalambda.formula_nodes import If
         return If(convert_operand(cond), convert_operand(self))
 
+    def in_(self, iterator):
+        from pyscalambda.formula_nodes import In
+        return In(convert_operand(self), convert_operand(iterator))
+
     def traverse_const_values(self):
         for child in self.children:
             for t in child.traverse_const_values():

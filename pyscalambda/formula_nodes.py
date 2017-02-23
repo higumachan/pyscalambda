@@ -189,3 +189,20 @@ class MakeDictionary(Formula):
                 yield t
             yield ','
         yield '}'
+
+
+class In(Formula):
+    def __init__(self, value, iterator):
+        super(In, self).__init__()
+        self.value = value
+        self.iterator = iterator
+        self.children = [self.value, self.iterator]
+
+    def traverse(self):
+        yield '('
+        for t in self.value.traverse():
+            yield t
+        yield ' in '
+        for t in self.iterator.traverse():
+            yield t
+        yield ')'
