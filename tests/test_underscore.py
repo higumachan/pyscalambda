@@ -1,5 +1,6 @@
 from functools import reduce
 from unittest import TestCase
+from itertools import product
 
 from nose.tools import (
     eq_,
@@ -201,3 +202,21 @@ class UnderscoreTest(TestCase):
     @raises(SyntaxError)
     def test_scalambda_iterator_set_syntax_error(self):
         eq_(SI({1, 2, _})(10), {1, 2, 10}) # because can't decide argument order
+
+    def test_virtual_logic_and(self):
+        for x, y in product([True, False], [True, False]):
+            eq_(_.and_(SC(x))(y), x and y)
+            eq_(SC(x).and_(_)(y), x and y)
+
+    @raises(TypeError)
+    def test_virtual_logic_and_not_callable(self):
+        eq_(_.and_(True)(False), None)
+
+    def test_virtual_logic_or(self):
+        for x, y in product([True, False], [True, False]):
+            eq_(_.or_(SC(x))(y), x or y)
+            eq_(SC(x).or_(_)(y), x or y)
+
+    @raises(TypeError)
+    def test_virtual_logic_or_not_callable(self):
+        eq_(_.or_(True)(False), None)
