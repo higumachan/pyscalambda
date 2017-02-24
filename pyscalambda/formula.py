@@ -56,10 +56,10 @@ class Formula(BaseFormula):
         return If(convert_operand(cond), convert_operand(self))
 
     def in_(self, iterator):
-        from pyscalambda.formula_nodes import In
+        from pyscalambda.operators import BinaryOperator
         if not hasattr(iterator, "__iter__"):
             raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
-        return In(convert_operand(self), convert_operand(iterator))
+        return BinaryOperator(" in ", convert_operand(self), convert_operand(iterator))
 
     def traverse_const_values(self):
         for child in self.children:
