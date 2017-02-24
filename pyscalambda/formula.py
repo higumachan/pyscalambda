@@ -61,6 +61,12 @@ class Formula(BaseFormula):
             raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
         return BinaryOperator(" in ", convert_operand(self), convert_operand(iterator))
 
+    def not_in_(self, iterator):
+        from pyscalambda.operators import BinaryOperator
+        if not hasattr(iterator, "__iter__"):
+            raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
+        return BinaryOperator(" not in ", convert_operand(self), convert_operand(iterator))
+
     def traverse_const_values(self):
         for child in self.children:
             for t in child.traverse_const_values():
