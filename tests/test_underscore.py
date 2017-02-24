@@ -213,3 +213,13 @@ class UnderscoreTest(TestCase):
     def test_virtual_in_type_error(self):
         _.in_(12)(100)
 
+    def test_virtual_not_in(self):
+        for iter_class in [set, list, tuple]:
+            ok_(not SC(1).not_in_(_)(iter_class([1, 2, 3])))
+            ok_(SC(4).not_in_(_)(iter_class([1, 2, 3])))
+            ok_(not _.not_in_(_)(2, iter_class([1, 2, 3])))
+
+    @raises(TypeError)
+    def test_virtual_not_in_type_error(self):
+        _.not_in_(12)(100)
+
