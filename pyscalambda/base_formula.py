@@ -46,6 +46,11 @@ class BaseFormula(object):
             )
         return f
 
+    def do_getattr(self, name):
+        GetAttr = import_module("pyscalambda.formula_nodes").GetAttr
+
+        return GetAttr(self, name)
+
     def __add__(self, other):
         return self.do_operator2(other, "+")
 
