@@ -1,4 +1,7 @@
+import copy
+
 from pyscalambda.base_formula import BaseFormula
+
 from pyscalambda.utility import convert_operand, is_scalambda_object
 
 
@@ -39,9 +42,10 @@ class Formula(BaseFormula):
         return "lambda {}:{}".format(args, body)
 
     def create_lambda(self):
-        binds = self.traverse_const_values()
+        binds = dict(self.traverse_const_values())
+        binds['copy'] = copy
         lambda_string = self.create_lambda_string()
-        return eval(lambda_string, dict(binds))
+        return eval(lambda_string, binds)
 
     def get_lambda(self):
         if not self.is_cache or self.cache_lambda is None:

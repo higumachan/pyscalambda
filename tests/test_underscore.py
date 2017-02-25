@@ -3,12 +3,13 @@ from unittest import TestCase
 from itertools import product
 
 from nose.tools import (
+    assert_is_not,
     eq_,
     ok_,
-    raises
+    raises,
 )
 
-from pyscalambda import not_, Q, SC, SF, SI, _, _1, _2, _3
+from pyscalambda import not_, Q, SC, SD, SF, SI, _, _1, _2, _3
 
 
 class UnderscoreTest(TestCase):
@@ -176,6 +177,15 @@ class UnderscoreTest(TestCase):
         eq_((_2 + 1).if_(_1 < 5).else_(_2 + 2)(10, 10), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 10, 12), 12)
         eq_(_.if_(_ < 5).else_(_)(11, 0, 12), 11)
+
+    def test_deep_const(self):
+        l = [1, 2, 3]
+        assert_is_not(SD(l)(), l)
+        (SD(l).append(_))(4)
+        eq_(l, [1, 2, 3])
+
+        (SC(l).append(_))(4)
+        eq_(l, [1, 2, 3, 4])
 
     def test_scalambdable_iterator(self):
         eq_(SI([1, 2, 3])(), [1, 2, 3])

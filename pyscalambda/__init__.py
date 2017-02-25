@@ -4,7 +4,13 @@ from pyscalambda.operators import UnaryOperator
 
 from pyscalambda.quote import quote
 
-from pyscalambda.scalambdable import scalambdable_const, scalambdable_func, scalambdable_iterator
+from pyscalambda.scalambdable import (
+    scalambdable_const,
+    scalambdable_deep_const,
+    scalambdable_func,
+    scalambdable_iterator,
+)
+
 
 from pyscalambda.utility import convert_operand
 
@@ -20,7 +26,9 @@ _8 = Underscore(8)
 _9 = Underscore(9)
 SF = scalambdable_func
 SC = scalambdable_const
+SD = scalambdable_deep_const
 SI = scalambdable_iterator
+
 Q = quote
 
 

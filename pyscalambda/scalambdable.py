@@ -2,7 +2,7 @@ import functools
 
 from pyscalambda.formula_nodes import FunctionCall, MakeDictionary, MakeIterator
 
-from pyscalambda.operands import ConstOperand
+from pyscalambda.operands import ConstOperand, DeepConstOperand
 
 from pyscalambda.utility import convert_operand, is_scalambda_object, is_unnamed_underscore, vmap
 
@@ -59,3 +59,7 @@ def scalambdable_iterator(iter):
 
 def scalambdable_const(value):
     return ConstOperand(value)
+
+
+def scalambdable_deep_const(value):
+    return DeepConstOperand(value)
