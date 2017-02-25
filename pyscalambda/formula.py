@@ -55,6 +55,18 @@ class Formula(BaseFormula):
         from pyscalambda.formula_nodes import If
         return If(convert_operand(cond), convert_operand(self))
 
+    def in_(self, iterator):
+        from pyscalambda.operators import BinaryOperator
+        if not hasattr(iterator, "__iter__"):
+            raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
+        return BinaryOperator(" in ", convert_operand(self), convert_operand(iterator))
+
+    def not_in_(self, iterator):
+        from pyscalambda.operators import BinaryOperator
+        if not hasattr(iterator, "__iter__"):
+            raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
+        return BinaryOperator(" not in ", convert_operand(self), convert_operand(iterator))
+
     def and_(self, other):
         from pyscalambda.operators import BinaryOperator
         if not is_scalambda_object(other):
