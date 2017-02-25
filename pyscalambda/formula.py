@@ -1,5 +1,5 @@
 from pyscalambda.base_formula import BaseFormula
-from pyscalambda.utility import convert_operand
+from pyscalambda.utility import convert_operand, is_scalambda_object
 
 
 class Formula(BaseFormula):
@@ -66,6 +66,18 @@ class Formula(BaseFormula):
         if not hasattr(iterator, "__iter__"):
             raise TypeError("argument of type '{}' is not iterable".format(type(iterator).__name__))
         return BinaryOperator(" not in ", convert_operand(self), convert_operand(iterator))
+
+    def and_(self, other):
+        from pyscalambda.operators import BinaryOperator
+        if not is_scalambda_object(other):
+            raise TypeError("other is only scalambdable object")
+        return BinaryOperator("and", self, other)
+
+    def or_(self, other):
+        from pyscalambda.operators import BinaryOperator
+        if not is_scalambda_object(other):
+            raise TypeError("other is only scalambdable object")
+        return BinaryOperator("or", self, other)
 
     def traverse_const_values(self):
         for child in self.children:
