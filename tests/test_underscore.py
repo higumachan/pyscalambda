@@ -4,10 +4,11 @@ from itertools import product
 
 from nose.tools import (
     eq_,
+    ok_,
     raises
 )
 
-from pyscalambda import Q, SC, SF, SI, _, _1, _2, _3
+from pyscalambda import not_, Q, SC, SF, SI, _, _1, _2, _3
 
 
 class UnderscoreTest(TestCase):
@@ -220,3 +221,13 @@ class UnderscoreTest(TestCase):
     @raises(TypeError)
     def test_virtual_logic_or_not_callable(self):
         eq_(_.or_(True)(False), None)
+
+    def test_virtual_not(self):
+        ok_(not not_(_)(True))
+        ok_(not_(_)(False))
+        ok_(not_(_.and_(SC(False)))(False))
+        ok_(not_(_.and_(SC(False)))(True))
+        ok_(not not_(_.and_(SC(True)))(True))
+        ok_(not_(_.or_(SC(False)))(False))
+        ok_(not not_(_.or_(SC(False)))(True))
+        ok_(not not_(_.or_(SC(True)))(True))
