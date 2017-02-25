@@ -41,11 +41,11 @@ class GetAttr(Formula):
 
         :rtype: function
         """
-        return self.get_lambda()
+        return self._get_lambda()
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.value.traverse():
+        for t in self.value._traverse():
             yield t
         yield '.'
         yield self.name
@@ -68,20 +68,20 @@ class MethodCall(Formula):
         self.kwargs = kwargs
         self.children = [self.value] + list(self.args) + list(self.kwargs.values())
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.value.traverse():
+        for t in self.value._traverse():
             yield t
         yield '.'
         yield self.method
         yield '('
         for arg in self.args:
-            for t in arg.traverse():
+            for t in arg._traverse():
                 yield t
             yield ','
         for name, arg in self.kwargs.items():
             yield '{}='.format(name)
-            for t in arg.traverse():
+            for t in arg._traverse():
                 yield t
             yield ','
         yield ')'
@@ -95,12 +95,12 @@ class GetItem(Formula):
         self.item = item
         self.children = [self.value, self.item]
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.value.traverse():
+        for t in self.value._traverse():
             yield t
         yield '['
-        for t in self.item.traverse():
+        for t in self.item._traverse():
             yield t
         yield ']'
         yield ')'
@@ -118,23 +118,23 @@ class FunctionCall(Formula):
         self.kwargs = kwargs
         self.children = self.args + list(self.kwargs.values())
 
-    def traverse(self):
+    def _traverse(self):
         yield "BIND_FUNC_{}".format(self.id)
         yield '('
         for arg in self.args:
-            for t in arg.traverse():
+            for t in arg._traverse():
                 yield t
             yield ','
         for name, arg in self.kwargs.items():
             yield '{}='.format(name)
-            for t in arg.traverse():
+            for t in arg._traverse():
                 yield t
             yield ','
         yield ')'
 
-    def traverse_const_values(self):
+    def _traverse_const_values(self):
         yield ('BIND_FUNC_{}'.format(self.id), self.func)
-        for t in super(FunctionCall, self).traverse_const_values():
+        for t in super(FunctionCall, self)._traverse_const_values():
             yield t
 
 
@@ -152,18 +152,18 @@ class Quote(Formula):
         kwargs = dict(map(lambda x: (x[0], convert_operand(x[1])), kwargs.items()))
         return self.formula(*map(convert_operand, args), **kwargs)
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield 'INNER_LAMBDA_{}'.format(self.id)
         yield ')'
 
-    def traverse_const_values(self):
-        for const_value in self.formula.traverse_const_values():
+    def _traverse_const_values(self):
+        for const_value in self.formula._traverse_const_values():
             yield const_value
         from pyscalambda.scalambdable import scalambdable_func
         yield (
             'INNER_LAMBDA_{}'.format(self.id),
-            scalambdable_func(self.formula.get_lambda())
+            scalambdable_func(self.formula._get_lambda())
         )
 
 
@@ -175,15 +175,15 @@ class IfElse(Formula):
         self.true = true
         self.false = false
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.true.traverse():
+        for t in self.true._traverse():
             yield t
         yield ' if '
-        for t in self.cond.traverse():
+        for t in self.cond._traverse():
             yield t
         yield 'else '
-        for t in self.false.traverse():
+        for t in self.false._traverse():
             yield t
         yield ')'
 
@@ -198,12 +198,12 @@ class If(Formula):
     def else_(self, false):
         return IfElse(self.cond, self.true, convert_operand(false))
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.true.traverse():
+        for t in self.true._traverse():
             yield t
         yield ' if '
-        for t in self.cond.traverse():
+        for t in self.cond._traverse():
             yield t
         yield 'else '
         yield 'None'
@@ -219,10 +219,10 @@ class MakeIterator(Formula):
         self.opener = opener
         self.closer = closer
 
-    def traverse(self):
+    def _traverse(self):
         yield self.opener
         for item in self.iter:
-            for t in item.traverse():
+            for t in item._traverse():
                 yield t
             yield ','
         yield self.closer
@@ -236,13 +236,13 @@ class MakeDictionary(Formula):
         self.type = type
         self.children = self.keys + self.values
 
-    def traverse(self):
+    def _traverse(self):
         yield '{'
         for k, v in zip(self.keys, self.values):
-            for t in k.traverse():
+            for t in k._traverse():
                 yield t
             yield ':'
-            for t in v.traverse():
+            for t in v._traverse():
                 yield t
             yield ','
         yield '}'

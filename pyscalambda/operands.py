@@ -18,18 +18,18 @@ class ConstOperand(Operand):
 
         self.is_use_dict = not can_str_emmbed(self.value)
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield "CONST_{}".format(self.id) if self.is_use_dict else str_emmbed(self.value)
         yield ')'
 
-    def traverse_const_values(self):
+    def _traverse_const_values(self):
         if self.is_use_dict:
             yield ('CONST_{}'.format(self.id), self.value)
 
 
 class DeepConstOperand(ConstOperand):
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield "copy.deepcopy(CONST_{})".format(self.id) if self.is_use_dict else str_emmbed(self.value)
         yield ')'
@@ -41,7 +41,7 @@ class UndefinedConstOperand(Operand):
         super(UndefinedConstOperand, self).__init__()
         self.value_name = value_name
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield self.value_name
         yield ')'
@@ -60,16 +60,16 @@ class Underscore(Operand):
             self.id = id
         self.in_arglist = in_arglist
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield "___ARG{}___".format(self.id)
         yield ')'
 
-    def traverse_args(self):
+    def _traverse_args(self):
         if self.in_arglist and not isinstance(self.id, str) and self.id >= Underscore.NUMBER_CONSTIZE:
             yield "___ARG{}___".format(self.id)
 
-    def traverse_constize_args(self):
+    def _traverse_constize_args(self):
         if self.in_arglist and (isinstance(self.id, str) or self.id < Underscore.NUMBER_CONSTIZE):
             yield "___ARG{}___".format(self.id)
 

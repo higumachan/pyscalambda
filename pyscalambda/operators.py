@@ -12,10 +12,10 @@ class UnaryOperator(Operator):
         self.value = value
         self.children = [self.value]
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
         yield self.operator
-        for t in self.value.traverse():
+        for t in self.value._traverse():
             yield t
         yield ')'
 
@@ -28,11 +28,11 @@ class BinaryOperator(Operator):
         self.right = right
         self.children = [self.left, self.right]
 
-    def traverse(self):
+    def _traverse(self):
         yield '('
-        for t in self.left.traverse():
+        for t in self.left._traverse():
             yield t
         yield self.operator
-        for t in self.right.traverse():
+        for t in self.right._traverse():
             yield t
         yield ')'
