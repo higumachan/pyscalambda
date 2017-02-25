@@ -26,7 +26,6 @@ class Formula(BaseFormula):
         self.is_cache = False
         return self
 
-
     def __call__(self, *args):
         """
 
@@ -79,20 +78,14 @@ class Formula(BaseFormula):
         return "lambda {}:{}".format(args, body)
 
     def _create_lambda(self):
-        """
-
-        :return: Callable
-        """
+        """:rtype: Callable"""
         binds = dict(self._traverse_const_values())
         binds['copy'] = copy
         lambda_string = self._create_lambda_string()
         return eval(lambda_string, binds)
 
     def _get_lambda(self):
-        """
-
-        :rtype: Callable
-        """
+        """:rtype: Callable"""
         if not self.is_cache or self.cache_lambda is None:
             self.cache_lambda = self._create_lambda()
         return self.cache_lambda
