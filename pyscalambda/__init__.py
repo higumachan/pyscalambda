@@ -27,4 +27,5 @@ Q = quote
 def not_(value):
     return UnaryOperator("not ", convert_operand(value))
 
+
 __all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF", "SC", "Q", "not_")
