@@ -74,21 +74,6 @@ class UnderscoreTest(TestCase):
         not_formula_and_eq((_ + x)(1), 2)
 
     def test_bug_case1(self):
-    def test_bug_case2(self):
-        class A(object):
-            def __init__(self, x):
-                self.x = x
-
-        class B(object):
-            def __init__(self):
-                pass
-
-            def f(self, x):
-                return A(x)
-        a = A(100)
-        b = B()
-        eq_((_.x)(a), 100)
-        eq_((_.f().x)(b), 100)
         not_formula_and_eq(("_a" + _)("test"), "_atest")
 
     def test_scalambdable_func(self):
