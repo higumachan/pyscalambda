@@ -2,14 +2,71 @@ from pyscalambda.formula import Formula
 from pyscalambda.utility import convert_operand
 
 
+class GetAttr(Formula):
+    def __init__(self, value, name):
+        """
+
+        :type value: Formula
+        :type name: str
+        """
+        super(GetAttr, self).__init__()
+        self.value = value
+        self.name = name
+
+        self.children = [self.value]
+
+    def __call__(self, *args, **kwargs):
+        """
+
+        :type args: List[Union[Formula, Any]]
+        :type kwargs: Dict[str, Union[Formula, Any]]
+        :rtype: Formula
+        """
+        return MethodCall(
+            convert_operand(self.value),
+            self.name,
+            list(map(convert_operand, args)),
+            dict(map(lambda x: (x[0], convert_operand(x[1])), kwargs.items()))
+        )
+
+    @property
+    def M(self):
+        """
+        Use this property in the folloing case
+        map(lambda x: x.text, [a, b, c])
+
+        Above code can be replaces as:
+
+        map(_.text.M, [a, b, c])
+
+        :rtype: function
+        """
+        return self.get_lambda()
+
+    def traverse(self):
+        yield '('
+        for t in self.value.traverse():
+            yield t
+        yield '.'
+        yield self.name
+        yield ')'
+
+
 class MethodCall(Formula):
     def __init__(self, value, method, args, kwargs):
+        """
+
+        :type value: Formula
+        :type method: str
+        :type args: List[Formula]
+        :type kwargs: Dict[str, Formula]
+        """
         super(MethodCall, self).__init__()
         self.value = value
         self.method = method
         self.args = args
         self.kwargs = kwargs
-        self.children = [self.value] + self.args + list(self.kwargs.values())
+        self.children = [self.value] + list(self.args) + list(self.kwargs.values())
 
     def traverse(self):
         yield '('
