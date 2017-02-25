@@ -1,12 +1,14 @@
 from functools import reduce
 from unittest import TestCase
+from itertools import product
 
 from nose.tools import (
     eq_,
+    ok_,
     raises
 )
 
-from pyscalambda import Q, SC, SF, SI, _, _1, _2, _3
+from pyscalambda import not_, Q, SC, SF, SI, _, _1, _2, _3
 
 
 class UnderscoreTest(TestCase):
@@ -201,3 +203,31 @@ class UnderscoreTest(TestCase):
     @raises(SyntaxError)
     def test_scalambda_iterator_set_syntax_error(self):
         eq_(SI({1, 2, _})(10), {1, 2, 10}) # because can't decide argument order
+
+    def test_virtual_logic_and(self):
+        for x, y in product([True, False], [True, False]):
+            eq_(_.and_(SC(x))(y), x and y)
+            eq_(SC(x).and_(_)(y), x and y)
+
+    @raises(TypeError)
+    def test_virtual_logic_and_not_callable(self):
+        eq_(_.and_(True)(False), None)
+
+    def test_virtual_logic_or(self):
+        for x, y in product([True, False], [True, False]):
+            eq_(_.or_(SC(x))(y), x or y)
+            eq_(SC(x).or_(_)(y), x or y)
+
+    @raises(TypeError)
+    def test_virtual_logic_or_not_callable(self):
+        eq_(_.or_(True)(False), None)
+
+    def test_virtual_not(self):
+        ok_(not not_(_)(True))
+        ok_(not_(_)(False))
+        ok_(not_(_.and_(SC(False)))(False))
+        ok_(not_(_.and_(SC(False)))(True))
+        ok_(not not_(_.and_(SC(True)))(True))
+        ok_(not_(_.or_(SC(False)))(False))
+        ok_(not not_(_.or_(SC(False)))(True))
+        ok_(not not_(_.or_(SC(True)))(True))
