@@ -2,7 +2,12 @@ from pyscalambda.operands import Underscore
 
 from pyscalambda.quote import quote
 
-from pyscalambda.scalambdable import scalambdable_const, scalambdable_deep_const, scalambdable_func, scalambdable_iterator
+from pyscalambda.scalambdable import (
+    scalambdable_const,
+    scalambdable_deep_const,
+    scalambdable_func,
+    scalambdable_iterator,
+)
 
 
 _ = Underscore(0)

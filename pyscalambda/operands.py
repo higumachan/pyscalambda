@@ -32,6 +32,7 @@ class DeepConstOperand(ConstOperand):
     def traverse(self):
         yield '('
         yield "copy.deepcopy(CONST_{})".format(self.id) if self.is_use_dict else str_emmbed(self.value)
+        yield ')'
 
 
 class UndefinedConstOperand(Operand):
