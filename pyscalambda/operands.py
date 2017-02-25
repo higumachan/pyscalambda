@@ -74,4 +74,4 @@ class Underscore(Operand):
             yield "___ARG{}___".format(self.id)
 
     def is_named(self):
-        return id == 0 or id >= Underscore.NUMBER_CONSTIZE
+        return self.id == 0 or self.id >= Underscore.NUMBER_CONSTIZE

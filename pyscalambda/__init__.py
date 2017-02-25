@@ -1,5 +1,7 @@
 from pyscalambda.operands import Underscore
 
+from pyscalambda.operators import UnaryOperator
+
 from pyscalambda.quote import quote
 
 from pyscalambda.scalambdable import (
@@ -9,6 +11,8 @@ from pyscalambda.scalambdable import (
     scalambdable_iterator,
 )
 
+
+from pyscalambda.utility import convert_operand
 
 _ = Underscore(0)
 _1 = Underscore(1)
@@ -27,4 +31,9 @@ SI = scalambdable_iterator
 
 Q = quote
 
-__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF", "SC", "Q")
+
+def not_(value):
+    return UnaryOperator("not ", convert_operand(value))
+
+
+__all__ = ("_", "_1", "_2", "_3", "_4", "_5", "_6", "_7", "_8", "_9", "SF", "SC", "Q", "not_")
