@@ -88,10 +88,7 @@ class Formula(BaseFormula):
         return BinaryOperator("or", self, other)
 
     def _create_lambda_string(self):
-        """
-
-        :rtype: str
-        """
+        """:rtype: str"""
         traversed = list(self._traverse())
         body = "".join(traversed)
 
