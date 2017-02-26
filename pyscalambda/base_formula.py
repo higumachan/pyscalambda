@@ -46,6 +46,11 @@ class BaseFormula(object):
             )
         return f
 
+    def do_getattr(self, name):
+        GetAttr = import_module("pyscalambda.formula_nodes").GetAttr
+
+        return GetAttr(self, name)
+
     def __add__(self, other):
         return self.do_operator2(other, "+")
 
@@ -169,10 +174,10 @@ class BaseFormula(object):
     def __invert__(self):
         return self.do_operator1("~")
 
-    def __getattr__(self, method):
-        if method == '__setstate__' or method == 'id':
+    def __getattr__(self, name):
+        if name == '__setstate__' or name == 'id':
             return None
-        return self.do_methodcall(method)
+        return self.do_getattr(name)
 
     def __getitem__(self, key):
         return self.do_getitem(key)

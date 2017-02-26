@@ -262,3 +262,11 @@ class UnderscoreTest(TestCase):
         not_formula_and_ok(not not_(_.or_(SC(False)))(True))
         not_formula_and_ok(not not_(_.or_(SC(True)))(True))
 
+    def test_get_attribute(self):
+        class A(object):
+            def __init__(self, x):
+                self.x = x
+
+        a = A(10)
+        not_formula_and_eq(_.x.M(a), 10)
+        not_formula_and_eq((_.x + 1)(a), 11)
