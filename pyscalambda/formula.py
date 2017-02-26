@@ -55,43 +55,43 @@ class Formula(BaseFormula):
         return BinaryOperator(" in ", convert_operand(self), convert_operand(seq))
 
     def not_in_(self, seq):
-        '''
+        """
 
         :type seq: list[T] | (T) | dict[T, U]
         :return:
-        '''
+        """
         from pyscalambda.operators import BinaryOperator
         if not hasattr(seq, "__iter__"):
             raise TypeError("argument of type '{}' is not iterable".format(type(seq).__name__))
         return BinaryOperator(" not in ", convert_operand(self), convert_operand(seq))
 
     def and_(self, other):
-        '''
+        """
 
         :type other: Formula
         :rtype: BinaryOperator
-        '''
+        """
         from pyscalambda.operators import BinaryOperator
         if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
         return BinaryOperator("and", self, other)
 
     def or_(self, other):
-        '''
+        """
 
         :type other: Formula
         :rtype: BinaryOperator
-        '''
+        """
         from pyscalambda.operators import BinaryOperator
         if not is_scalambda_object(other):
             raise TypeError("other is only scalambdable object")
         return BinaryOperator("or", self, other)
 
     def _create_lambda_string(self):
-        '''
+        """
 
         :rtype: str
-        '''
+        """
         traversed = list(self._traverse())
         body = "".join(traversed)
 
