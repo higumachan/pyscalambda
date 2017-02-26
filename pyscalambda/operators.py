@@ -7,6 +7,11 @@ class Operator(Formula):
 
 class UnaryOperator(Operator):
     def __init__(self, operator, value):
+        """
+
+        :param operator: str
+        :param value: Formula
+        """
         super(UnaryOperator, self).__init__()
         self.operator = operator
         self.value = value
@@ -22,6 +27,12 @@ class UnaryOperator(Operator):
 
 class BinaryOperator(Operator):
     def __init__(self, operator, left, right):
+        """
+
+        :type operator: str
+        :type left: Formula
+        :type right: Formula
+        """
         super(BinaryOperator, self).__init__()
         self.operator = operator
         self.left = left

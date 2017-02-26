@@ -7,6 +7,12 @@ from pyscalambda.utility import convert_operand, vmap
 
 class BaseFormula(object):
     def do_operator2(self, other, operator):
+        """
+
+        :type other: Any
+        :type operator: str
+        :rtype: BinaryOperator
+        """
         BinaryOperator = import_module("pyscalambda.operators").BinaryOperator
 
         this = convert_operand(self)
@@ -14,6 +20,12 @@ class BaseFormula(object):
         return BinaryOperator(operator, this, other)
 
     def rdo_operator2(self, other, operator):
+        """
+
+        :type other: Any
+        :type operator: str
+        :rtype: BinaryOperator
+        """
         BinaryOperator = import_module("pyscalambda.operators").BinaryOperator
 
         this = convert_operand(self)
@@ -21,6 +33,11 @@ class BaseFormula(object):
         return BinaryOperator(operator, other, this)
 
     def do_operator1(self, operator):
+        """
+
+        :type operator: str
+        :rtype: UnaryOperator
+        """
         UnaryOperator = import_module("pyscalambda.operators").UnaryOperator
 
         this = convert_operand(self)
