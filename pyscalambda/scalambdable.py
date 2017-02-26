@@ -37,6 +37,11 @@ def validate_unorderd(iter):
 
 
 def scalambdable_iterator(iter):
+    """
+
+    :type: iter: list[T] | (T) | dict[T, U]
+    :rtype: MakeIterator | MakeDictionaly
+    """
     wrappers = {
         list: ('[', ']'),
         tuple: ('(', ')'),
@@ -58,8 +63,18 @@ def scalambdable_iterator(iter):
 
 
 def scalambdable_const(value):
+    """
+
+    :type value: Any
+    :rtype: ConstOperand
+    """
     return ConstOperand(value)
 
 
 def scalambdable_deep_const(value):
+    """
+
+    :type value: Any
+    :rtype: DeepConstOperand
+    """
     return DeepConstOperand(value)

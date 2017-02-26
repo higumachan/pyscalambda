@@ -33,6 +33,11 @@ Q = quote
 
 
 def not_(value):
+    '''
+
+    :type value: bool | Formula
+    :rtype:
+    '''
     return UnaryOperator("not ", convert_operand(value))
 
 

@@ -22,6 +22,12 @@ class UnaryOperator(Operator):
 
 class BinaryOperator(Operator):
     def __init__(self, operator, left, right):
+        '''
+
+        :type operator: str
+        :type left: Formula
+        :type right: Formula
+        '''
         super(BinaryOperator, self).__init__()
         self.operator = operator
         self.left = left
